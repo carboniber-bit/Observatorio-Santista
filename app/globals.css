@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  /* Paleta: preto, branco e cinzas neutros. Contrastes sobre paper (#ffffff):
+     ink 18.9:1, gray-4 10.3:1, gray-3 4.7:1 (AA para texto normal). */
+  --color-ink: #111111;
+  --color-paper: #ffffff;
+  --color-gray-1: #f2f2f2;
+  --color-gray-2: #d4d4d4;
+  --color-gray-3: #737373;
+  --color-gray-4: #404040;
+
+  /* Séries de gráficos, distinguíveis em escala de cinza. */
+  --color-chart-1: #111111;
+  --color-chart-2: #595959;
+  --color-chart-3: #8c8c8c;
+  --color-chart-4: #bfbfbf;
+
+  --font-serif: Georgia, "Times New Roman", Times, serif;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+}
