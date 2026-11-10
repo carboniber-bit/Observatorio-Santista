@@ -1,0 +1,19 @@
+project_id = "observatorio-santista"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+
+[db]
+port = 54322
+major_version = 15
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+# Painel admin exige AAL2 (TOTP).
+[auth.mfa.totp]
+enroll_enabled = true
+verify_enabled = true
