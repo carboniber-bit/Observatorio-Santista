@@ -139,6 +139,11 @@ create table public.admin_allowlist (
 -- Helper de admin
 -- ---------------------------------------------------------------------------
 
+-- Admin = JWT com aal2 (TOTP) E e-mail na allowlist. A claim `email` so e confiavel
+-- porque, com "Confirm email" LIGADO ([auth.email] enable_confirmations = true no
+-- config.toml), contas com e-mail nao verificado nao conseguem obter JWT. Em producao
+-- mantenha "Confirm email" ligado e desative signups publicos assim que a conta admin
+-- existir. A logica abaixo nao checa verificacao por conta propria.
 create function public.is_admin()
 returns boolean
 language sql
@@ -184,10 +189,52 @@ create trigger analyses_no_delete before delete on public.analyses
 create trigger change_log_no_delete before delete on public.change_log
   for each row execute function public.forbid_mutation();
 
+-- TRUNCATE nao dispara gatilhos de linha: gatilho de instrucao em cada tabela protegida.
+create trigger candidates_no_truncate before truncate on public.candidates
+  for each statement execute function public.forbid_mutation();
+create trigger proposals_no_truncate before truncate on public.proposals
+  for each statement execute function public.forbid_mutation();
+create trigger sources_no_truncate before truncate on public.sources
+  for each statement execute function public.forbid_mutation();
+create trigger news_no_truncate before truncate on public.news
+  for each statement execute function public.forbid_mutation();
+create trigger analyses_no_truncate before truncate on public.analyses
+  for each statement execute function public.forbid_mutation();
+create trigger change_log_no_truncate before truncate on public.change_log
+  for each statement execute function public.forbid_mutation();
+
 create trigger vote_events_immutable before update or delete on public.vote_events
   for each row execute function public.forbid_mutation();
 create trigger vote_events_no_truncate before truncate on public.vote_events
   for each statement execute function public.forbid_mutation();
+
+-- change_log publico so para linhas cujo registro de origem esta publico.
+-- security definer: as politicas das tabelas de origem filtrariam 'retirada' para anon,
+-- mas as correcoes (retirada) devem aparecer no historico publico.
+create function public.change_log_is_public(p_table text, p_row uuid)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select case p_table
+    when 'candidates' then true
+    when 'proposals' then exists (
+      select 1 from public.proposals p
+      where p.id = p_row and p.status in ('publicada', 'corrigida', 'retirada'))
+    when 'news' then exists (
+      select 1 from public.news n
+      where n.id = p_row and n.status in ('publicada', 'retirada'))
+    when 'analyses' then exists (
+      select 1 from public.analyses a
+      where a.id = p_row and a.status = 'publicada')
+    else false
+  end;
+$$;
+
+revoke all on function public.change_log_is_public(text, uuid) from public;
+grant execute on function public.change_log_is_public(text, uuid) to anon, authenticated, service_role;
 
 -- ---------------------------------------------------------------------------
 -- Privilégios
@@ -195,9 +242,15 @@ create trigger vote_events_no_truncate before truncate on public.vote_events
 
 -- O Supabase concede tudo a anon/authenticated por padrão: zera e concede só o necessário.
 revoke all on all tables in schema public from anon, authenticated;
+alter default privileges in schema public revoke all on tables from anon, authenticated;
 
 grant select on public.candidates, public.themes, public.proposals, public.sources,
-  public.news, public.analyses, public.change_log to anon, authenticated;
+  public.news, public.analyses to anon, authenticated;
+
+-- change_log: leitura por coluna, SEM `author` (e-mail do admin). Leitura do autor
+-- pelo admin fica para a tarefa 3 (ex.: RPC security definer).
+grant select (id, table_name, row_id, old_value, new_value, changed_at, reason, source_id)
+  on public.change_log to anon, authenticated;
 
 grant insert, update on public.candidates, public.themes, public.proposals, public.sources,
   public.news, public.analyses to authenticated;
@@ -208,8 +261,11 @@ grant select, update on public.correction_requests to authenticated;
 -- Inserções em vote_events virão só pela função security definer cast_vote (tarefa 5).
 revoke update, delete, truncate on public.vote_events from public, anon, authenticated, service_role;
 
-revoke delete on public.candidates, public.proposals, public.sources, public.news,
+revoke delete, truncate on public.candidates, public.proposals, public.sources, public.news,
   public.analyses, public.change_log from public, anon, authenticated, service_role;
+
+-- change_log e trilha de auditoria: so insercao.
+revoke update on public.change_log from public, anon, authenticated, service_role;
 
 -- ---------------------------------------------------------------------------
 -- RLS
@@ -248,7 +304,8 @@ create policy news_public_read on public.news
 create policy analyses_public_read on public.analyses
   for select to anon, authenticated using (status = 'publicada');
 create policy change_log_public_read on public.change_log
-  for select to anon, authenticated using (true);
+  for select to anon, authenticated
+  using (public.change_log_is_public(table_name, row_id));
 
 -- Leitura do admin (conteúdo não publicado)
 create policy proposals_admin_read on public.proposals
@@ -258,6 +315,8 @@ create policy sources_admin_read on public.sources
 create policy news_admin_read on public.news
   for select to authenticated using (public.is_admin());
 create policy analyses_admin_read on public.analyses
+  for select to authenticated using (public.is_admin());
+create policy change_log_admin_read on public.change_log
   for select to authenticated using (public.is_admin());
 create policy correction_requests_admin_read on public.correction_requests
   for select to authenticated using (public.is_admin());

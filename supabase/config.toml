@@ -17,3 +17,7 @@ sql_paths = ["./seed.sql"]
 [auth.mfa.totp]
 enroll_enabled = true
 verify_enabled = true
+
+# is_admin() confia na claim `email`: so e seguro com confirmacao de e-mail ligada.
+[auth.email]
+enable_confirmations = true
