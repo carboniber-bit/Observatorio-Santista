@@ -15,7 +15,8 @@ export function isVotingOpen(
   return now.getTime() >= opens
 }
 
-// `votesFromHashLastHour` NÃO inclui o voto que está sendo registrado.
+// `votesFromHashLastHour` INCLUI o voto que está sendo registrado: até 5 votos por hora
+// do mesmo hash são válidos e o 6º é suspeito.
 export function classifyVote(votesFromHashLastHour: number): 'valid' | 'suspicious' {
   return votesFromHashLastHour > SUSPICIOUS_VOTES_PER_HASH_PER_HOUR ? 'suspicious' : 'valid'
 }

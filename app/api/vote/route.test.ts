@@ -15,6 +15,7 @@ type CastArgs = Parameters<VoteDeps['db']['castVote']>[0]
 function setup(overrides: { env?: Partial<VoteDeps['env']>; now?: Date; captcha?: boolean; recent?: number; castError?: unknown } = {}) {
   const usedTokens = new Set<string>()
   const casts: CastArgs[] = []
+  const successes: CastArgs[] = []
   const counted: Array<{ voterHash: string; sinceIso: string }> = []
   const handler = createVoteHandler({
     now: () => overrides.now ?? NOW,
@@ -36,11 +37,12 @@ function setup(overrides: { env?: Partial<VoteDeps['env']>; now?: Date; captcha?
         casts.push(args)
         if (usedTokens.has(args.tokenHash)) return false
         usedTokens.add(args.tokenHash)
+        successes.push(args)
         return true
       },
     },
   })
-  return { handler, casts, counted, usedTokens }
+  return { handler, casts, counted, usedTokens, successes }
 }
 
 function voteRequest(
@@ -98,7 +100,7 @@ describe('POST /api/vote', () => {
   })
 
   it('duas requisições simultâneas com o mesmo cookie: um 200 e um 409', async () => {
-    const { handler, usedTokens } = setup()
+    const { handler, usedTokens, successes } = setup()
     const { cookieValue } = newVoterToken(SECRET)
     const cookie = `os26_voter=${cookieValue}`
     const [a, b] = await Promise.all([
@@ -107,6 +109,7 @@ describe('POST /api/vote', () => {
     ])
     expect([a.status, b.status].sort()).toEqual([200, 409])
     expect(usedTokens.size).toBe(1)
+    expect(successes.length).toBe(1)
   })
 
   it('cookie válido reaproveita o token (mesmo tokenHash que o do cookie)', async () => {
@@ -168,10 +171,10 @@ describe('POST /api/vote', () => {
       ['campo extra', voteRequest({ ...valid, extra: 1 })],
       ['sem token do captcha', voteRequest({ ...valid, turnstileToken: '' })],
     ]
-    for (const [, req] of cases) {
+    for (const [label, req] of cases) {
       const res = await handler.POST(req)
-      expect(res.status).toBe(400)
-      expect(await res.json()).toEqual({ status: 'invalid' })
+      expect(`${label}: ${res.status}`).toBe(`${label}: 400`)
+      expect(`${label}: ${JSON.stringify(await res.json())}`).toBe(`${label}: {"status":"invalid"}`)
     }
     expect(casts.length).toBe(0)
   })
@@ -211,13 +214,13 @@ describe('POST /api/vote', () => {
     expect(counted[0].sinceIso).toBe(new Date(NOW.getTime() - 3600_000).toISOString())
   })
 
-  it('5 votos anteriores do hash: ainda valid; 6 anteriores: suspicious', async () => {
-    const five = setup({ recent: 5 })
-    await five.handler.POST(voteRequest(valid))
-    expect(five.casts[0].flag).toBe('valid')
-    const six = setup({ recent: 6 })
-    await six.handler.POST(voteRequest(valid))
-    expect(six.casts[0].flag).toBe('suspicious')
+  it('4 votos anteriores: o 5º é valid; 5 anteriores: o 6º é suspicious', async () => {
+    const fifth = setup({ recent: 4 })
+    await fifth.handler.POST(voteRequest(valid))
+    expect(fifth.casts[0].flag).toBe('valid')
+    const sixth = setup({ recent: 5 })
+    await sixth.handler.POST(voteRequest(valid))
+    expect(sixth.casts[0].flag).toBe('suspicious')
   })
 
   it('violação de chave estrangeira (23503) do castVote dá 400', async () => {

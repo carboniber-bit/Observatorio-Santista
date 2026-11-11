@@ -1,5 +1,5 @@
 begin;
-select plan(19);
+select plan(21);
 
 -- Candidato de teste vem do seed. Funcoes chamadas como postgres (dono).
 select is(
@@ -61,6 +61,18 @@ select is(
   (select count(*)::int from public.vote_hashes where voter_hash = 'hash-g'),
   1, 'service_role consegue contar hashes recentes em vote_hashes');
 reset role;
+
+-- Anonimato por horario: o created_at do token e truncado ao dia e nao coincide
+-- com o de nenhum vote_events (o instante da transacao so e meia-noite exata
+-- com probabilidade desprezivel; o teste abaixo exige que o voto nao seja).
+select is(
+  not exists (select 1 from public.voter_tokens where created_at <> date_trunc('day', created_at)),
+  true, 'voter_tokens.created_at fica exatamente a meia-noite');
+select is(
+  now() <> date_trunc('day', now())
+  and not exists (
+    select 1 from public.voter_tokens t join public.vote_events e on e.created_at = t.created_at),
+  true, 'nenhum created_at de voter_tokens coincide com o de vote_events');
 
 select * from finish();
 rollback;

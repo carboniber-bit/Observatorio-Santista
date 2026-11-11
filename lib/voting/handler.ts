@@ -149,7 +149,8 @@ export function createVoteHandler(deps: VoteDeps) {
       )
       const sinceIso = new Date(now.getTime() - 60 * 60 * 1000).toISOString()
       const recent = await db.countRecentHashVotes(voterHash, sinceIso)
-      const flag = classifyVote(recent)
+      // classifyVote recebe a contagem INCLUINDO o voto atual: 5 por hora valem, o 6º é suspeito.
+      const flag = classifyVote(recent + 1)
 
       // 8. Grava
       let recorded: boolean

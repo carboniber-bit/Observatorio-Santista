@@ -32,8 +32,10 @@ begin
     raise exception 'flag invalida: %', p_flag using errcode = '22023';
   end if;
 
-  insert into public.voter_tokens (token_hash)
-  values (p_token_hash)
+  -- created_at truncado ao dia: o horário preciso do token não pode ser usado
+  -- para ligar a linha de voter_tokens a vote_events/vote_hashes (que usam now()).
+  insert into public.voter_tokens (token_hash, created_at)
+  values (p_token_hash, date_trunc('day', now()))
   on conflict do nothing;
 
   if not found then
