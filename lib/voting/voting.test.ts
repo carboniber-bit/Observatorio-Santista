@@ -106,6 +106,11 @@ describe('isVotingOpen', () => {
     expect(isVotingOpen(new Date('2026-11-25T12:00:00-03:00'), 'lixo')).toBe(false)
   })
 
+  it('data inválida (NaN) fecha a votação', () => {
+    expect(isVotingOpen(new Date('lixo'), undefined)).toBe(false)
+    expect(isVotingOpen(new Date(Number.NaN), '2026-11-20T00:00:00-03:00')).toBe(false)
+  })
+
   it('lê VOTING_OPENS_AT do ambiente por padrão', () => {
     const original = process.env.VOTING_OPENS_AT
     try {

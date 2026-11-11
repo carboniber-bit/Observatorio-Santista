@@ -7,6 +7,7 @@ export function isVotingOpen(
   now: Date,
   opensAt: string | undefined = process.env.VOTING_OPENS_AT,
 ): boolean {
+  if (Number.isNaN(now.getTime())) return false
   if (now.getTime() >= VOTING_CLOSES_AT.getTime()) return false
   if (opensAt === undefined || opensAt === '') return true
   const opens = Date.parse(opensAt)
