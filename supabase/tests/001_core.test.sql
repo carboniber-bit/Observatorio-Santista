@@ -1,25 +1,32 @@
 begin;
 select plan(48);
 
--- Dados de teste (papel postgres, ignora RLS). Os gatilhos editoriais da migracao 0002
--- (proposta nova so em_revisao, motivo obrigatorio) ficam desligados so durante o seed.
-set local session_replication_role = replica;
+-- Dados de teste (papel postgres, ignora RLS). Propostas entram em_revisao (regra da
+-- migracao 0002) e sao promovidas abaixo com motivo e fonte com trecho.
 insert into public.admin_allowlist (email) values ('admin@teste.local');
 
 insert into public.proposals (id, candidate_id, theme_id, description, source_kind, status)
 select v.id, c.id, t.id, 'proposta de teste', 'reportagem', v.status
 from public.candidates c, public.themes t,
   (values
-    ('00000000-0000-0000-0000-0000000000a1'::uuid, 'publicada'),
-    ('00000000-0000-0000-0000-0000000000a2'::uuid, 'corrigida'),
+    ('00000000-0000-0000-0000-0000000000a1'::uuid, 'em_revisao'),
+    ('00000000-0000-0000-0000-0000000000a2'::uuid, 'em_revisao'),
     ('00000000-0000-0000-0000-0000000000a3'::uuid, 'em_revisao'),
-    ('00000000-0000-0000-0000-0000000000a4'::uuid, 'retirada')
+    ('00000000-0000-0000-0000-0000000000a4'::uuid, 'em_revisao')
   ) as v(id, status)
 where c.slug = 'marcelo-teixeira' and t.slug = 'futebol';
 
-insert into public.sources (proposal_id, url) values
-  ('00000000-0000-0000-0000-0000000000a1', 'https://exemplo.com/publicada'),
-  ('00000000-0000-0000-0000-0000000000a3', 'https://exemplo.com/em-revisao');
+insert into public.sources (proposal_id, url, excerpt) values
+  ('00000000-0000-0000-0000-0000000000a1', 'https://exemplo.com/publicada', 'trecho publicada'),
+  ('00000000-0000-0000-0000-0000000000a2', 'https://exemplo.com/corrigida', 'trecho corrigida'),
+  ('00000000-0000-0000-0000-0000000000a3', 'https://exemplo.com/em-revisao', null);
+
+-- Promocao com motivo (escopo restrito); gera 1 linha de change_log por proposta (a1, a2, a4)
+do $$ begin perform set_config('app.change_reason', 'seed', true); end $$;
+update public.proposals set status = 'publicada' where id = '00000000-0000-0000-0000-0000000000a1';
+update public.proposals set status = 'corrigida' where id = '00000000-0000-0000-0000-0000000000a2';
+update public.proposals set status = 'retirada' where id = '00000000-0000-0000-0000-0000000000a4';
+do $$ begin perform set_config('app.change_reason', '', true); end $$;
 
 insert into public.news (slug, title, body, category, badge, status) values
   ('noticia-publicada', 'Publicada', 'texto', 'eleicao', 'plataforma', 'publicada'),
@@ -32,9 +39,7 @@ insert into public.analyses (slug, title, facts, candidate_statements, editorial
 insert into public.change_log (table_name, row_id, new_value, author)
 select 'proposals', v.id, '{}'::jsonb, 'admin@teste.local'
 from (values
-  ('00000000-0000-0000-0000-0000000000a1'::uuid),
-  ('00000000-0000-0000-0000-0000000000a3'::uuid),
-  ('00000000-0000-0000-0000-0000000000a4'::uuid)
+  ('00000000-0000-0000-0000-0000000000a3'::uuid)
 ) as v(id);
 insert into public.change_log (table_name, row_id, new_value, author)
 select 'candidates', id, '{}'::jsonb, 'admin@teste.local' from public.candidates limit 1;
@@ -43,8 +48,6 @@ select 'news', id, '{}'::jsonb, 'admin@teste.local' from public.news where statu
 
 insert into public.vote_events (id, candidate_id, is_socio) values
   ('00000000-0000-0000-0000-0000000000b1', null, true);
-
-set local session_replication_role = origin;
 
 -- (e) seed
 select is((select count(*)::int from public.candidates), 4,
@@ -58,7 +61,7 @@ select is((select count(*)::int from public.proposals), 2,
   '(a) anon ve apenas 2 propostas (publicada e corrigida)');
 select is((select count(*)::int from public.proposals where status in ('em_revisao', 'retirada')), 0,
   '(a) anon nao ve propostas em_revisao nem retirada');
-select is((select count(*)::int from public.sources), 1,
+select is((select count(*)::int from public.sources), 2,
   'anon so ve fontes de propostas publicadas ou corrigidas');
 select is((select count(*)::int from public.news), 1,
   'anon so ve noticias publicadas');
@@ -81,8 +84,8 @@ select throws_ok(
   $$select author from public.change_log$$,
   '42501'::char(5), 'permission denied for table change_log',
   'anon nao le a coluna author de change_log');
-select is((select count(*)::int from public.change_log), 3,
-  'anon ve change_log de proposta publicada, retirada e de candidato, nao de rascunhos');
+select is((select count(*)::int from public.change_log), 4,
+  'anon ve change_log de proposta publicada, corrigida, retirada e de candidato, nao de rascunhos');
 select is((select count(*)::int from public.change_log where row_id = '00000000-0000-0000-0000-0000000000a1'), 1,
   'anon ve change_log de proposta publicada');
 select is((select count(*)::int from public.change_log where row_id = '00000000-0000-0000-0000-0000000000a3'), 0,
@@ -140,10 +143,11 @@ set local request.jwt.claims = '{"role":"authenticated","aal":"aal2","email":"ad
 select is(public.is_admin(), true, 'aal2 + e-mail na allowlist e admin');
 select is((select count(*)::int from public.proposals), 4,
   'admin ve todas as propostas, inclusive nao publicadas');
+do $$ begin perform set_config('app.change_reason', 'teste', true); end $$;
 select lives_ok(
-  $$select public.admin_update_candidate((select id from public.candidates where slug = 'marcelo-teixeira'),
-      '{"ticket_name":"Chapa Teste"}', 'teste')$$,
-  'admin atualiza candidates (via RPC com motivo)');
+  $$update public.candidates set ticket_name = 'Chapa Teste' where slug = 'marcelo-teixeira'$$,
+  'admin atualiza candidates');
+do $$ begin perform set_config('app.change_reason', '', true); end $$;
 select is((select ticket_name from public.candidates where slug = 'marcelo-teixeira'), 'Chapa Teste',
   'a atualizacao do admin foi aplicada');
 
