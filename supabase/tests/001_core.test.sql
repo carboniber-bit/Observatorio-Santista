@@ -1,7 +1,9 @@
 begin;
 select plan(48);
 
--- Dados de teste (papel postgres, ignora RLS)
+-- Dados de teste (papel postgres, ignora RLS). Os gatilhos editoriais da migracao 0002
+-- (proposta nova so em_revisao, motivo obrigatorio) ficam desligados so durante o seed.
+set local session_replication_role = replica;
 insert into public.admin_allowlist (email) values ('admin@teste.local');
 
 insert into public.proposals (id, candidate_id, theme_id, description, source_kind, status)
@@ -41,6 +43,8 @@ select 'news', id, '{}'::jsonb, 'admin@teste.local' from public.news where statu
 
 insert into public.vote_events (id, candidate_id, is_socio) values
   ('00000000-0000-0000-0000-0000000000b1', null, true);
+
+set local session_replication_role = origin;
 
 -- (e) seed
 select is((select count(*)::int from public.candidates), 4,
@@ -137,8 +141,9 @@ select is(public.is_admin(), true, 'aal2 + e-mail na allowlist e admin');
 select is((select count(*)::int from public.proposals), 4,
   'admin ve todas as propostas, inclusive nao publicadas');
 select lives_ok(
-  $$update public.candidates set ticket_name = 'Chapa Teste' where slug = 'marcelo-teixeira'$$,
-  'admin atualiza candidates');
+  $$select public.admin_update_candidate((select id from public.candidates where slug = 'marcelo-teixeira'),
+      '{"ticket_name":"Chapa Teste"}', 'teste')$$,
+  'admin atualiza candidates (via RPC com motivo)');
 select is((select ticket_name from public.candidates where slug = 'marcelo-teixeira'), 'Chapa Teste',
   'a atualizacao do admin foi aplicada');
 
