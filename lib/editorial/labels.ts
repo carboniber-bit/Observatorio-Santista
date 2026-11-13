@@ -72,3 +72,54 @@ export function formatDatePtBr(value: string | Date): string {
 export function isSafeHttpUrl(url: string): boolean {
   return url.startsWith('http://') || url.startsWith('https://')
 }
+
+export const NEWS_CATEGORIES = [
+  'eleicao',
+  'candidatos',
+  'propostas',
+  'estatuto-e-regras',
+  'clube',
+  'plataforma',
+] as const
+
+export type NewsCategory = (typeof NEWS_CATEGORIES)[number]
+
+export const NEWS_CATEGORY_LABELS: Record<NewsCategory, string> = {
+  eleicao: 'Eleição',
+  candidatos: 'Candidatos',
+  propostas: 'Propostas',
+  'estatuto-e-regras': 'Estatuto e regras',
+  clube: 'Clube',
+  plataforma: 'Plataforma',
+}
+
+export const BADGE_LABELS = {
+  plataforma: 'Dado da plataforma',
+  terceiros: 'Informação de terceiros',
+  editorial: 'Análise editorial',
+} as const
+
+export type Badge = keyof typeof BADGE_LABELS
+
+export function isBadge(value: string): value is Badge {
+  return Object.prototype.hasOwnProperty.call(BADGE_LABELS, value)
+}
+
+const SP_DATETIME_FORMAT = new Intl.DateTimeFormat('pt-BR', {
+  timeZone: 'America/Sao_Paulo',
+  day: '2-digit',
+  month: '2-digit',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+})
+
+// dd/mm/yyyy HH:mm em America/Sao_Paulo; valor inválido => ''.
+export function formatDateTimePtBr(value: string | Date): string {
+  const date = typeof value === 'string' ? new Date(value) : value
+  if (Number.isNaN(date.getTime())) return ''
+  const parts = SP_DATETIME_FORMAT.formatToParts(date)
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? ''
+  return `${get('day')}/${get('month')}/${get('year')} ${get('hour')}:${get('minute')}`
+}
