@@ -32,7 +32,7 @@ export default function CookiesPage() {
         </table>
       </div>
       <p className="mt-6">
-        Preferência de filtro dos resultados: guardada apenas na URL, não é cookie.
+        Preferência de filtro dos resultados: guardada apenas na URL (parâmetro ?filtro=), não é cookie.
       </p>
       <p className="mt-4">
         Durante a verificação anti-robô, o Cloudflare Turnstile pode definir seus próprios cookies ou armazenamento

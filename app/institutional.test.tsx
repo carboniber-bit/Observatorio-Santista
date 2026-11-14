@@ -156,6 +156,11 @@ describe('privacidade', () => {
     const text = container.textContent ?? ''
     for (const s of ['Controlador', 'Turnstile', '7 dias', '90 dias', 'LGPD']) expect(text).toContain(s)
     expect(container.querySelector('a[href="/cookies"]')).not.toBeNull()
+    expect(text).toContain('mantidos de forma anônima')
+    expect(text).not.toContain('agregada')
+    expect(text).toContain('nunca o valor bruto')
+    expect(text).toContain('não é apagado pela rotina de 7 dias')
+    expect(text).toContain('hash temporário do remetente')
   })
 
   it('sem NEXT_PUBLIC_CONTACT_EMAIL aponta para /corrigir', () => {

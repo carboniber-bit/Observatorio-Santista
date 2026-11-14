@@ -49,7 +49,12 @@ export default function PrivacidadePage() {
               abuso e apagado após 7 dias. O endereço IP não é armazenado.
             </li>
             <li>O token do desafio Turnstile é processado pela Cloudflare para verificar que o acesso não é automatizado.</li>
-            <li>Pedidos de correção: o texto, um link opcional e um e-mail opcional.</li>
+            <li>Pedidos de correção: o texto, um link opcional e um e-mail opcional, além de um hash temporário do remetente, apagado após 7 dias.</li>
+            <li>
+              Hash do token do cookie: o servidor guarda apenas um hash (nunca o valor bruto) do token aleatório do
+              cookie, com a data de criação truncada ao dia, para impedir votos duplicados. Esse registro não é apagado
+              pela rotina de 7 dias; é mantido enquanto for necessário para a integridade da votação.
+            </li>
           </ul>
           <p className="mt-3">Não usamos ferramentas de análise de audiência nem publicidade.</p>
         </section>
@@ -74,7 +79,7 @@ export default function PrivacidadePage() {
           <ul className="list-disc space-y-2 pl-6">
             <li>Hash temporário: apagado após 7 dias.</li>
             <li>E-mail opcional de correção: apagado 90 dias após o tratamento do pedido.</li>
-            <li>Votos: mantidos de forma agregada e anônima.</li>
+            <li>Votos: mantidos de forma anônima (candidato, autodeclaração de sócio, sinalização de validade e momento do voto), sem ligação com uma pessoa.</li>
           </ul>
         </section>
 
