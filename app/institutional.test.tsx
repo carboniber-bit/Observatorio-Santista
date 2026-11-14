@@ -182,7 +182,7 @@ describe('cookies', () => {
     const rows = container.querySelectorAll('tbody tr')
     expect(rows).toHaveLength(1)
     expect(rows[0].textContent).toContain('os26_voter')
-    expect(container.textContent).toContain('guardada apenas na URL, não é cookie')
+    expect(container.textContent).toContain('guardada apenas na URL (parâmetro ?filtro=), não é cookie')
   })
 })
 
