@@ -9,6 +9,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.5",
     "@supabase/supabase-js": "^2",
     "next": "^15.0.0",
     "react": "^19.0.0",
