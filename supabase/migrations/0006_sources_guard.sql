@@ -5,7 +5,7 @@
 -- Regras para fontes de proposta publicada ou corrigida:
 --   * UPDATE nunca pode deixar o trecho (excerpt) em branco;
 --   * UPDATE nao pode mover a fonte para outra proposta;
---   * UPDATE que muda url ou excerpt exige motivo (app.change_reason), definido
+--   * qualquer UPDATE que mude a fonte (url, excerpt, outlet, kind, datas) exige motivo (app.change_reason), definido
 --     pela RPC admin_update_source;
 --   * DELETE que deixaria a proposta sem fonte com trecho e rejeitado (DELETE ja e
 --     bloqueado por sources_no_delete e REVOKE; esta e uma segunda barreira).
@@ -56,7 +56,7 @@ begin
     raise exception 'fonte de proposta publicada nao pode ficar sem trecho (excerpt)'
       using errcode = 'P0001';
   end if;
-  if (new.url is distinct from old.url or new.excerpt is distinct from old.excerpt)
+  if (old.* is distinct from new.*)
      and btrim(coalesce(current_setting('app.change_reason', true), ''), E' \t\r\n') = '' then
     raise exception 'alteracao de fonte publicada exige motivo: use admin_update_source'
       using errcode = 'P0001';

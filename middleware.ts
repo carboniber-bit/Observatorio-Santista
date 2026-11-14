@@ -18,7 +18,10 @@ export async function middleware(request: NextRequest) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   if (!url || !key) {
     // Sem configuração não há como autenticar: fecha o painel.
-    return harden(NextResponse.redirect(new URL('/', request.url)))
+    const home = request.nextUrl.clone()
+    home.pathname = '/'
+    home.search = ''
+    return harden(NextResponse.redirect(home))
   }
 
   const pending: { name: string; value: string; options?: object }[] = []
@@ -37,7 +40,11 @@ export async function middleware(request: NextRequest) {
   })
 
   const redirectTo = (path: string) => {
-    const res = NextResponse.redirect(new URL(path, request.url))
+    const target = request.nextUrl.clone()
+    const [pathPart, query = ''] = path.split('?')
+    target.pathname = pathPart
+    target.search = query ? `?${query}` : ''
+    const res = NextResponse.redirect(target)
     for (const c of pending) res.cookies.set(c.name, c.value, c.options as never)
     return harden(res)
   }

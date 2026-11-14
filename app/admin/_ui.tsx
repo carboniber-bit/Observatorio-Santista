@@ -10,15 +10,38 @@ export const BUTTON_SECONDARY =
 
 export type Flash = { ok?: string | string[]; erro?: string | string[] }
 
-function first(v: string | string[] | undefined): string | undefined {
-  const s = Array.isArray(v) ? v[0] : v
-  return s ? s.slice(0, 300) : undefined
+// Mensagens fixas por código: o texto nunca vem da URL.
+const OK_MESSAGES: Record<string, string> = {
+  proposta: 'Proposta salva (em revisão).',
+  publicada: 'Publicação registrada.',
+  corrigida: 'Proposta marcada como corrigida.',
+  retirada: 'Retirada registrada.',
+  fonte: 'Fonte salva.',
+  noticia: 'Notícia salva (rascunho).',
+  analise: 'Análise salva (rascunho).',
+  candidato: 'Candidato atualizado.',
+  correcao: 'Pedido marcado como tratado.',
+}
+const ERROR_MESSAGES: Record<string, string> = {
+  motivo: 'Informe o motivo da alteração.',
+  fonte: 'Proposta sem fonte com trecho comprobatório: não pode ser publicada.',
+  trecho: 'Mantenha o trecho comprobatório da fonte: uma fonte de proposta publicada não pode ficar sem trecho.',
+  acesso: 'Acesso negado.',
+  duplicado: 'Já existe um registro com este identificador (slug).',
+  inexistente: 'Pedido não encontrado ou sem permissão. Nada foi alterado.',
+  invalido: 'Dados inválidos. Revise os campos e tente novamente.',
+  falha: 'Não foi possível concluir a operação. Nada foi alterado.',
 }
 
-// Mensagem de retorno das ações (?ok= / ?erro=). Renderizada como texto, nunca como HTML.
+function first(v: string | string[] | undefined): string | undefined {
+  return Array.isArray(v) ? v[0] : v
+}
+
 export function FlashMessage({ params }: { params: Flash }) {
-  const ok = first(params.ok)
-  const erro = first(params.erro)
+  const okKey = first(params.ok)
+  const errKey = first(params.erro)
+  const ok = okKey ? OK_MESSAGES[okKey] : undefined
+  const erro = errKey ? (ERROR_MESSAGES[errKey] ?? ERROR_MESSAGES.falha) : undefined
   if (!ok && !erro) return null
   return erro ? (
     <p role="alert" className="mb-6 border-2 border-ink bg-gray-1 p-3 font-semibold">

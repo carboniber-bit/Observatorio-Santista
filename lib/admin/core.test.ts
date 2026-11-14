@@ -9,7 +9,7 @@ const NOW = new Date('2026-11-20T12:00:00Z')
 type Call = { op: string; args: unknown }
 
 // Dublê escrito à mão: registra cada chamada e deixa configurar contagem de fontes e falhas.
-function setup(opts: { sourcesWithExcerpt?: number; dbError?: unknown; adminError?: unknown } = {}) {
+function setup(opts: { sourcesWithExcerpt?: number; dbError?: unknown; adminError?: unknown; handledRows?: number; publishedAt?: string | null } = {}) {
   const calls: Call[] = []
   const state = { status: 'em_revisao' }
   const fail = () => {
@@ -34,6 +34,11 @@ function setup(opts: { sourcesWithExcerpt?: number; dbError?: unknown; adminErro
     async markCorrectionHandled(id, handledAtIso) {
       calls.push({ op: 'handled', args: { id, handledAtIso } })
       fail()
+      return opts.handledRows ?? 1
+    },
+    async currentPublishedAt(table, id) {
+      calls.push({ op: 'publishedAt', args: { table, id } })
+      return opts.publishedAt ?? null
     },
   }
   let authChecks = 0
@@ -313,7 +318,15 @@ describe('notícias, análises, candidatos e correções', () => {
   it('publishNews grava status publicada e published_at', async () => {
     const { core, calls } = setup()
     await core.publishNews(UUID, 'revisada')
-    expect((calls[0].args as { patch: unknown }).patch).toEqual({ status: 'publicada', published_at: NOW.toISOString() })
+    expect((calls[1].args as { patch: unknown }).patch).toEqual({ status: 'publicada', published_at: NOW.toISOString() })
+  })
+
+  it('republicar notícia ou análise mantém o published_at original', async () => {
+    const { core, calls } = setup({ publishedAt: '2026-11-01T10:00:00Z' })
+    await core.publishNews(UUID, 'republicada')
+    await core.publishAnalysis(UUID, 'republicada')
+    const updates = calls.filter((c) => c.op === 'update').map((c) => (c.args as { patch: unknown }).patch)
+    expect(updates).toEqual([{ status: 'publicada' }, { status: 'publicada' }])
   })
 
   it('retractNews e retractAnalysis gravam retirada', async () => {
@@ -355,6 +368,12 @@ describe('notícias, análises, candidatos e correções', () => {
     expect(Object.keys(args.patch).sort()).toEqual(['candidate_statements', 'editorial_interpretation', 'facts', 'title'])
   })
 
+  it('markCorrectionHandled com zero linhas atualizadas devolve erro e não afirma sucesso', async () => {
+    const { core } = setup({ handledRows: 0 })
+    const result = await core.markCorrectionHandled(UUID, 'respondido ao leitor')
+    expect(result).toEqual({ ok: false, error: 'Pedido não encontrado ou sem permissão. Nada foi alterado.' })
+  })
+
   it('markCorrectionHandled grava a data de tratamento', async () => {
     const { core, calls } = setup()
     const result = await core.markCorrectionHandled(UUID, 'respondido ao leitor')
@@ -376,6 +395,16 @@ describe('erros não vazam detalhes', () => {
     const { core } = setup({ dbError: { code: '23505', message: 'duplicate key value violates unique constraint "news_slug_key"' } })
     const result = await core.saveNewsDraft({ ...newsInput, reason: 'motivo válido' })
     expect(result).toEqual({ ok: false, error: 'Já existe um registro com este identificador (slug).' })
+  })
+
+  it('mensagens da guarda de fontes viram frases claras em pt-BR', async () => {
+    const a = setup({ dbError: { code: 'P0001', message: 'fonte de proposta publicada nao pode ficar sem trecho (excerpt)' } })
+    expect(await a.core.updateSource(UUID, sourceInput, 'motivo válido')).toEqual({
+      ok: false,
+      error: 'Mantenha o trecho comprobatório da fonte: uma fonte de proposta publicada não pode ficar sem trecho.',
+    })
+    const b = setup({ dbError: { code: 'P0001', message: 'alteracao de fonte publicada exige motivo: use admin_update_source' } })
+    expect(await b.core.updateSource(UUID, sourceInput, 'motivo válido')).toEqual({ ok: false, error: 'Informe o motivo da alteração.' })
   })
 
   it('acesso negado do banco vira Acesso negado.', async () => {

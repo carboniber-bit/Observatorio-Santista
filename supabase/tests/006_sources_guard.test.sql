@@ -1,5 +1,5 @@
 begin;
-select plan(12);
+select plan(15);
 
 insert into public.admin_allowlist (email) values ('admin@teste.local');
 
@@ -51,10 +51,25 @@ select is((select count(*)::int from public.change_log
 select is((select reason from public.change_log where table_name = 'sources'), 'teste',
   'change_log guarda o motivo da edicao da fonte');
 
--- Campos nao protegidos (outlet) nao exigem motivo.
+-- Qualquer campo da fonte publicada exige motivo (outlet, kind, datas tambem).
+select throws_ok(
+  $$update public.sources set outlet = 'Jornal' where id = '00000000-0000-0000-0000-0000000000d2'$$,
+  'P0001', 'alteracao de fonte publicada exige motivo: use admin_update_source',
+  'UPDATE de outlet sem motivo em proposta publicada e rejeitado');
+select throws_ok(
+  $$update public.sources set kind = 'x' where id = '00000000-0000-0000-0000-0000000000d2'$$,
+  'P0001', 'alteracao de fonte publicada exige motivo: use admin_update_source',
+  'UPDATE de kind sem motivo e rejeitado');
+select throws_ok(
+  $$update public.sources set consulted_on = current_date where id = '00000000-0000-0000-0000-0000000000d2'$$,
+  'P0001', 'alteracao de fonte publicada exige motivo: use admin_update_source',
+  'UPDATE de data sem motivo e rejeitado');
+
+do $$ begin perform set_config('app.change_reason', 'ajuste de veiculo', true); end $$;
 select lives_ok(
   $$update public.sources set outlet = 'Jornal' where id = '00000000-0000-0000-0000-0000000000d2'$$,
-  'UPDATE de outlet sem motivo passa');
+  'UPDATE de outlet com motivo passa');
+do $$ begin perform set_config('app.change_reason', '', true); end $$;
 
 -- DELETE: remover a unica fonte com trecho e rejeitado; com outra restante, passa
 -- pela guarda (e cai no bloqueio geral sources_no_delete).

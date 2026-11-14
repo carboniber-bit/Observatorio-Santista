@@ -28,11 +28,18 @@ export function makeSupabaseAdminDb(getClient: () => SupabaseClient): AdminDb {
       ).length
     },
     async markCorrectionHandled(id, handledAtIso) {
-      const { error } = await getClient()
+      const { data, error } = await getClient()
         .from('correction_requests')
         .update({ status: 'tratada', handled_at: handledAtIso })
         .eq('id', id)
+        .select('id')
       if (error) throw error
+      return (data ?? []).length
+    },
+    async currentPublishedAt(table, id) {
+      const { data, error } = await getClient().from(table).select('published_at').eq('id', id).maybeSingle()
+      if (error) throw error
+      return ((data as { published_at: string | null } | null)?.published_at) ?? null
     },
   }
 }

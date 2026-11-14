@@ -37,7 +37,10 @@ export interface AdminDb {
     args: { id: string; patch: Row; reason: string; sourceId?: string },
   ): Promise<void>
   countSourcesWithExcerpt(proposalId: string): Promise<number>
-  markCorrectionHandled(id: string, handledAtIso: string): Promise<void>
+  // Devolve quantas linhas foram atualizadas (0 = pedido inexistente ou sem permissão).
+  markCorrectionHandled(id: string, handledAtIso: string): Promise<number>
+  // published_at atual da notícia/análise (null se ainda não publicada).
+  currentPublishedAt(table: 'news' | 'analyses', id: string): Promise<string | null>
 }
 
 export type AdminResult = { ok: true; id?: string } | { ok: false; error: string }
@@ -56,6 +59,10 @@ export function friendlyError(err: unknown): string {
   const text = String((err as { message?: unknown })?.message ?? err ?? '')
   const code = String((err as { code?: unknown })?.code ?? '')
   if (/publicada sem ao menos uma fonte/i.test(text)) return MSG_NO_SOURCE
+  if (/ficar sem trecho|nao pode mudar de proposta|manter ao menos uma fonte/i.test(text)) {
+    return 'Mantenha o trecho comprobatório da fonte: uma fonte de proposta publicada não pode ficar sem trecho.'
+  }
+  if (/exige motivo/i.test(text)) return MSG_REASON
   if (code === '42501' || /acesso negado/i.test(text)) return MSG_DENIED
   if (code === '23505' || /duplicate key/i.test(text)) {
     return 'Já existe um registro com este identificador (slug).'
@@ -200,6 +207,17 @@ export function makeAdminCore(deps: AdminCoreDeps) {
     })
   }
 
+  // published_at só é definido na primeira publicação: republicar mantém a data original.
+  async function statusPatch(
+    table: 'news' | 'analyses',
+    id: string,
+    status: 'publicada' | 'retirada',
+  ): Promise<Row> {
+    if (status !== 'publicada') return { status }
+    const current = await db.currentPublishedAt(table, id)
+    return current ? { status } : { status, published_at: now().toISOString() }
+  }
+
   // ---- Notícias -----------------------------------------------------------
 
   async function saveNewsDraft(input: NewsInput): Promise<AdminResult> {
@@ -231,7 +249,7 @@ export function makeAdminCore(deps: AdminCoreDeps) {
     return guarded(reason, async (r) => {
       const nid = parse(idSchema, id)
       if (isFail(nid)) return nid
-      const patch: Row = status === 'publicada' ? { status, published_at: now().toISOString() } : { status }
+      const patch = await statusPatch('news', nid, status)
       await db.update('admin_update_news', { id: nid, patch, reason: r })
       return { ok: true, id: nid }
     })
@@ -273,7 +291,7 @@ export function makeAdminCore(deps: AdminCoreDeps) {
     return guarded(reason, async (r) => {
       const aid = parse(idSchema, id)
       if (isFail(aid)) return aid
-      const patch: Row = status === 'publicada' ? { status, published_at: now().toISOString() } : { status }
+      const patch = await statusPatch('analyses', aid, status)
       await db.update('admin_update_analysis', { id: aid, patch, reason: r })
       return { ok: true, id: aid }
     })
@@ -313,7 +331,8 @@ export function makeAdminCore(deps: AdminCoreDeps) {
     return guarded(reason, async () => {
       const cid = parse(idSchema, id)
       if (isFail(cid)) return cid
-      await db.markCorrectionHandled(cid, now().toISOString())
+      const updated = await db.markCorrectionHandled(cid, now().toISOString())
+      if (updated < 1) return fail('Pedido não encontrado ou sem permissão. Nada foi alterado.')
       return { ok: true, id: cid }
     })
   }

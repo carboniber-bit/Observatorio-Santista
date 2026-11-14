@@ -12,12 +12,24 @@ function str(fd: FormData, key: string): string {
   return typeof v === 'string' ? v : ''
 }
 
-function back(path: string, result: AdminResult, okMessage: string, editId?: string): never {
+// Códigos fixos na URL; o texto exibido vem de uma tabela no servidor (app/admin/_ui.tsx).
+function errorCode(message: string): string {
+  if (/motivo da altera/i.test(message)) return 'motivo'
+  if (/sem fonte com trecho/i.test(message)) return 'fonte'
+  if (/Mantenha o trecho/i.test(message)) return 'trecho'
+  if (/Acesso negado/i.test(message)) return 'acesso'
+  if (/identificador \(slug\)/i.test(message) && /Já existe/.test(message)) return 'duplicado'
+  if (/não encontrado ou sem permissão/i.test(message)) return 'inexistente'
+  if (/Nada foi alterado/i.test(message)) return 'falha'
+  return 'invalido'
+}
+
+function back(path: string, result: AdminResult, okCode: string, editId?: string): never {
   const params = new URLSearchParams()
   if (result.ok) {
-    params.set('ok', okMessage)
+    params.set('ok', okCode)
   } else {
-    params.set('erro', result.error)
+    params.set('erro', errorCode(result.error))
     if (editId) params.set('editar', editId)
   }
   redirect(`${path}?${params.toString()}`)
@@ -34,7 +46,7 @@ export async function formSaveProposal(fd: FormData): Promise<void> {
     referenceYear: str(fd, 'referenceYear') as never,
     reason: str(fd, 'reason'),
   })
-  back('/admin/propostas', result, 'Proposta salva (em revisão).', id || undefined)
+  back('/admin/propostas', result, 'proposta', id || undefined)
 }
 
 export async function formProposalStatus(fd: FormData): Promise<void> {
@@ -46,13 +58,13 @@ export async function formProposalStatus(fd: FormData): Promise<void> {
   let msg: string
   if (op === 'publish') {
     result = await actions.publishProposal(id, reason)
-    msg = 'Proposta publicada.'
+    msg = 'publicada'
   } else if (op === 'correct') {
     result = await actions.correctProposal(id, reason, sourceId)
-    msg = 'Proposta marcada como corrigida.'
+    msg = 'corrigida'
   } else if (op === 'retract') {
     result = await actions.retractProposal(id, reason, sourceId)
-    msg = 'Proposta retirada.'
+    msg = 'retirada'
   } else {
     result = { ok: false, error: 'Operação inválida.' }
     msg = ''
@@ -73,7 +85,7 @@ export async function formAddSource(fd: FormData): Promise<void> {
     },
     str(fd, 'reason'),
   )
-  back('/admin/fontes', result, 'Fonte adicionada.')
+  back('/admin/fontes', result, 'fonte')
 }
 
 export async function formUpdateSource(fd: FormData): Promise<void> {
@@ -89,7 +101,7 @@ export async function formUpdateSource(fd: FormData): Promise<void> {
     },
     str(fd, 'reason'),
   )
-  back('/admin/fontes', result, 'Fonte atualizada.')
+  back('/admin/fontes', result, 'fonte')
 }
 
 export async function formSaveNews(fd: FormData): Promise<void> {
@@ -104,7 +116,7 @@ export async function formSaveNews(fd: FormData): Promise<void> {
     sourceUrl: str(fd, 'sourceUrl'),
     reason: str(fd, 'reason'),
   })
-  back('/admin/noticias', result, 'Notícia salva (rascunho).', id || undefined)
+  back('/admin/noticias', result, 'noticia', id || undefined)
 }
 
 export async function formNewsStatus(fd: FormData): Promise<void> {
@@ -117,7 +129,7 @@ export async function formNewsStatus(fd: FormData): Promise<void> {
       : op === 'retract'
         ? await actions.retractNews(id, reason)
         : ({ ok: false, error: 'Operação inválida.' } as AdminResult)
-  back('/admin/noticias', result, op === 'publish' ? 'Notícia publicada.' : 'Notícia retirada.')
+  back('/admin/noticias', result, op === 'publish' ? 'publicada' : 'retirada')
 }
 
 export async function formSaveAnalysis(fd: FormData): Promise<void> {
@@ -131,7 +143,7 @@ export async function formSaveAnalysis(fd: FormData): Promise<void> {
     editorialInterpretation: str(fd, 'editorialInterpretation'),
     reason: str(fd, 'reason'),
   })
-  back('/admin/analises', result, 'Análise salva (rascunho).', id || undefined)
+  back('/admin/analises', result, 'analise', id || undefined)
 }
 
 export async function formAnalysisStatus(fd: FormData): Promise<void> {
@@ -144,7 +156,7 @@ export async function formAnalysisStatus(fd: FormData): Promise<void> {
       : op === 'retract'
         ? await actions.retractAnalysis(id, reason)
         : ({ ok: false, error: 'Operação inválida.' } as AdminResult)
-  back('/admin/analises', result, op === 'publish' ? 'Análise publicada.' : 'Análise retirada.')
+  back('/admin/analises', result, op === 'publish' ? 'publicada' : 'retirada')
 }
 
 export async function formSaveCandidate(fd: FormData): Promise<void> {
@@ -161,10 +173,10 @@ export async function formSaveCandidate(fd: FormData): Promise<void> {
     photoUrl: str(fd, 'photoUrl'),
     reason: str(fd, 'reason'),
   })
-  back('/admin/candidatos', result, 'Candidato atualizado.', id || undefined)
+  back('/admin/candidatos', result, 'candidato', id || undefined)
 }
 
 export async function formHandleCorrection(fd: FormData): Promise<void> {
   const result = await actions.markCorrectionHandled(str(fd, 'id'), str(fd, 'reason'))
-  back('/admin/correcoes', result, 'Pedido marcado como tratado.')
+  back('/admin/correcoes', result, 'correcao')
 }
