@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import type { SupabaseClient, User } from '@supabase/supabase-js'
 import { decideAccess, redirectFor, type AccessDecision } from './guard'
 
@@ -16,7 +16,7 @@ export async function createAdminClient(): Promise<SupabaseClient> {
   return createServerClient(url, key, {
     cookies: {
       getAll: () => store.getAll(),
-      setAll(list) {
+      setAll(list: { name: string; value: string; options?: CookieOptions }[]) {
         // Em Server Components a escrita de cookies falha; o middleware já renova a sessão.
         try {
           for (const { name, value, options } of list) store.set(name, value, options)

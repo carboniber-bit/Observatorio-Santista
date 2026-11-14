@@ -1,4 +1,4 @@
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 import { decideAccess, isPublicAdminPath, redirectFor } from '@/lib/admin/guard'
 
@@ -28,7 +28,7 @@ export async function middleware(request: NextRequest) {
   const supabase = createServerClient(url, key, {
     cookies: {
       getAll: () => request.cookies.getAll(),
-      setAll(list) {
+      setAll(list: { name: string; value: string; options?: CookieOptions }[]) {
         for (const c of list) request.cookies.set(c.name, c.value)
         response = NextResponse.next({ request })
         for (const c of list) {
