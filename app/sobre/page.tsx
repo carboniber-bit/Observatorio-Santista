@@ -1,8 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BRAND_NAME } from '@/lib/brand'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = { title: `Sobre | ${BRAND_NAME}` }
+export const metadata: Metadata = pageMetadata({
+  title: `Sobre | ${BRAND_NAME}`,
+  description: 'Quem faz o Observatório Santista 2026, como o projeto é mantido e por que é independente.',
+  path: '/sobre',
+})
 
 export default function SobrePage() {
   return (

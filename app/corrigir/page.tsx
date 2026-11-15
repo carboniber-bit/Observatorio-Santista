@@ -1,10 +1,13 @@
 import type { Metadata } from 'next'
 import { CorrectionForm } from '@/components/CorrectionForm'
 import { BRAND_NAME } from '@/lib/brand'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `Pedir correção | ${BRAND_NAME}`,
-}
+  description: 'Envie um pedido de correção sobre informações publicadas no site.',
+  path: '/corrigir',
+})
 
 export default function CorrigirPage() {
   return (

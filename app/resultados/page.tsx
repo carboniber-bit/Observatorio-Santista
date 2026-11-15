@@ -2,14 +2,17 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { ResultsPanel } from '@/components/ResultsPanel'
 import { getDailySeries, getResults, getSocioSplit, parseFilter } from '@/lib/results'
+import { pageMetadata } from '@/lib/seo'
 import { createAnonClient } from '@/lib/supabase/anon'
 import { VOTING_CLOSES_AT, isVotingOpen } from '@/lib/voting/rules'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: 'Resultados da simulação',
-}
+  description: 'Resultados da votação informal sobre a eleição presidencial do Santos em 2026.',
+  path: '/resultados',
+})
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 

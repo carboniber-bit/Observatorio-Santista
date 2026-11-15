@@ -198,8 +198,10 @@ describe('regras globais', () => {
     for (const v of views) expect(v.container.textContent).not.toMatch(FORBIDDEN)
   })
 
-  it('nenhum arquivo usa dangerouslySetInnerHTML', () => {
+  // Atualizado na T14: o único uso permitido é components/JsonLd.tsx (JSON-LD com "<" escapado).
+  it('nenhum arquivo usa dangerouslySetInnerHTML, salvo components/JsonLd.tsx', () => {
     const root = path.resolve(__dirname, '..')
+    expect(readFileSync(path.join(root, 'components/JsonLd.tsx'), 'utf8')).toContain('safeJsonLd')
     const files = [
       'app/page.tsx',
       'components/HomeView.tsx',
@@ -207,6 +209,7 @@ describe('regras globais', () => {
       'app/metodologia/page.tsx',
       'app/privacidade/page.tsx',
       'app/cookies/page.tsx',
+      'app/candidatos/[slug]/page.tsx',
     ]
     for (const f of files) expect(readFileSync(path.join(root, f), 'utf8')).not.toContain('dangerouslySetInnerHTML')
   })

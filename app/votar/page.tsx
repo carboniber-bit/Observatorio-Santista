@@ -3,14 +3,17 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { VoteForm } from '@/components/VoteForm'
 import { BRAND_NAME } from '@/lib/brand'
+import { pageMetadata } from '@/lib/seo'
 import { createAnonClient } from '@/lib/supabase/anon'
 import { VOTING_CLOSES_AT, isVotingOpen } from '@/lib/voting/rules'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `Votar | ${BRAND_NAME}`,
-}
+  description: 'Participe da votação informal e anônima sobre a eleição presidencial do Santos em 2026.',
+  path: '/votar',
+})
 
 async function loadCandidates(): Promise<{ id: string; name: string }[]> {
   const { data, error } = await createAnonClient().from('candidates').select('id, name')

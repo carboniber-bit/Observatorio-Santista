@@ -2,13 +2,16 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { ChangeLogList } from '@/components/ChangeLogList'
 import { BRAND_NAME } from '@/lib/brand'
+import { pageMetadata } from '@/lib/seo'
 import { getChangeLog } from '@/lib/editorial/changelog'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `Histórico de atualizações | ${BRAND_NAME}`,
-}
+  description: 'Registro público das alterações feitas no conteúdo do site.',
+  path: '/historico',
+})
 
 export default async function HistoricoPage() {
   let body: ReactNode

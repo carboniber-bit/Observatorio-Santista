@@ -22,12 +22,28 @@ type Props = { candidate: Candidate; themes: Theme[]; proposals: ProposalWithSou
 
 type SourceEntry = { source: Source; kind: string | null }
 
-function Section({ label, children }: { label: string; children: ReactNode }) {
+function Section({
+  label,
+  children,
+  heading = true,
+}: {
+  label: string
+  children: ReactNode
+  heading?: boolean
+}) {
+  const LABEL_CLASS = 'mb-3 font-serif text-xl font-bold'
   return (
     <section className="border-t border-gray-2 pt-6">
-      <h2 data-testid="profile-label" className="mb-3 font-serif text-xl font-bold">
-        {label}
-      </h2>
+      {heading ? (
+        <h2 data-testid="profile-label" className={LABEL_CLASS}>
+          {label}
+        </h2>
+      ) : (
+        // O rótulo "Nome" não é título: o h1 do perfil vem logo abaixo e abre a hierarquia.
+        <p data-testid="profile-label" className={LABEL_CLASS}>
+          {label}
+        </p>
+      )}
       {children}
     </section>
   )
@@ -103,7 +119,7 @@ export function CandidateProfile({ candidate, themes, proposals }: Props) {
 
   return (
     <article className="space-y-8">
-      <Section label={L_NAME}>
+      <Section label={L_NAME} heading={false}>
         <div className="flex items-center gap-4">
           {candidate.photo_url ? (
             // eslint-disable-next-line @next/next/no-img-element

@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 type TurnstileOptions = {
   sitekey: string
   callback: (token: string) => void
   'expired-callback': () => void
   'error-callback': () => void
+  'timeout-callback': () => void
+  language: string
 }
 
 type TurnstileApi = {
@@ -67,6 +69,7 @@ export function TurnstileWidget({ siteKey, onToken, resetSignal = 0 }: Turnstile
   const widgetIdRef = useRef<string | null>(null)
   const onTokenRef = useRef(onToken)
   const lastResetRef = useRef(resetSignal)
+  const [failed, setFailed] = useState(false)
 
   useEffect(() => {
     onTokenRef.current = onToken
@@ -81,13 +84,23 @@ export function TurnstileWidget({ siteKey, onToken, resetSignal = 0 }: Turnstile
         if (cancelled || !container || !window.turnstile || widgetIdRef.current !== null) return
         widgetIdRef.current = window.turnstile.render(container, {
           sitekey: siteKey,
-          callback: (token) => onTokenRef.current(token),
+          language: 'pt-br',
+          callback: (token) => {
+            setFailed(false)
+            onTokenRef.current(token)
+          },
           'expired-callback': () => onTokenRef.current(null),
-          'error-callback': () => onTokenRef.current(null),
+          'timeout-callback': () => onTokenRef.current(null),
+          'error-callback': () => {
+            setFailed(true)
+            onTokenRef.current(null)
+          },
         })
       })
       .catch(() => {
-        if (!cancelled) onTokenRef.current(null)
+        if (cancelled) return
+        setFailed(true)
+        onTokenRef.current(null)
       })
     return () => {
       cancelled = true
@@ -122,5 +135,15 @@ export function TurnstileWidget({ siteKey, onToken, resetSignal = 0 }: Turnstile
     )
   }
 
-  return <div ref={containerRef} data-testid="turnstile-container" className="min-h-[65px]" />
+  return (
+    <>
+      <div ref={containerRef} data-testid="turnstile-container" className="min-h-[65px]" />
+      {failed && (
+        <p role="alert" className="mt-2 border border-gray-3 bg-gray-1 p-3 text-sm text-ink">
+          Não foi possível carregar a verificação anti-robô. Desative bloqueadores de anúncios para esta página e
+          recarregue.
+        </p>
+      )}
+    </>
+  )
 }

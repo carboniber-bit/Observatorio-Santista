@@ -2,13 +2,16 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { NewsList } from '@/components/NewsList'
 import { BRAND_NAME } from '@/lib/brand'
+import { pageMetadata } from '@/lib/seo'
 import { getPublishedNews, parseCategory } from '@/lib/editorial/content'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `Notícias | ${BRAND_NAME}`,
-}
+  description: 'Notícias sobre a eleição presidencial do Santos Futebol Clube em 2026.',
+  path: '/noticias',
+})
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 

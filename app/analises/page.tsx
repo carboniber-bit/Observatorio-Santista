@@ -3,15 +3,18 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { ProvenanceBadge } from '@/components/ProvenanceBadge'
 import { BRAND_NAME } from '@/lib/brand'
+import { pageMetadata } from '@/lib/seo'
 import { getAnalyses } from '@/lib/editorial/content'
 import { formatDatePtBr } from '@/lib/editorial/labels'
 import { EditorialText } from '@/lib/editorial/text'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `Análises | ${BRAND_NAME}`,
-}
+  description: 'Análises editoriais sobre a eleição presidencial do Santos Futebol Clube em 2026.',
+  path: '/analises',
+})
 
 export default async function AnalisesPage() {
   let body: ReactNode

@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { cache } from 'react'
+import { JsonLd } from '@/components/JsonLd'
 import { CandidateProfile } from '@/components/CandidateProfile'
 import { BRAND_NAME } from '@/lib/brand'
 import {
@@ -10,24 +12,32 @@ import {
   type ProposalWithSources,
   type Theme,
 } from '@/lib/editorial/queries'
+import { candidatePageJsonLd, pageMetadata } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 
 type Params = Promise<{ slug: string }>
 
-async function safeCandidate(slug: string): Promise<{ ok: true; candidate: Candidate | null } | { ok: false }> {
-  try {
-    return { ok: true, candidate: await getCandidateBySlug(slug) }
-  } catch {
-    return { ok: false }
-  }
-}
+// cache(): generateMetadata e a página compartilham uma única consulta por requisição.
+const safeCandidate = cache(
+  async (slug: string): Promise<{ ok: true; candidate: Candidate | null } | { ok: false }> => {
+    try {
+      return { ok: true, candidate: await getCandidateBySlug(slug) }
+    } catch {
+      return { ok: false }
+    }
+  },
+)
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { slug } = await params
   const result = await safeCandidate(slug)
   if (!result.ok || !result.candidate) return { title: BRAND_NAME }
-  return { title: `${result.candidate.name} | ${BRAND_NAME}` }
+  return pageMetadata({
+    title: `${result.candidate.name} | ${BRAND_NAME}`,
+    description: `Perfil, propostas e fontes públicas de ${result.candidate.name}, candidato à presidência do Santos em 2026.`,
+    path: `/candidatos/${result.candidate.slug}`,
+  })
 }
 
 export default async function CandidatoPage({ params }: { params: Params }) {
@@ -48,6 +58,7 @@ export default async function CandidatoPage({ params }: { params: Params }) {
 
   return (
     <main className="mx-auto max-w-3xl px-4 py-10">
+      <JsonLd data={candidatePageJsonLd(candidate.name, candidate.slug)} />
       <CandidateProfile candidate={candidate} themes={themes} proposals={proposals} />
     </main>
   )

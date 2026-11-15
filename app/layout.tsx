@@ -3,9 +3,12 @@ import type { ReactNode } from 'react';
 import './globals.css';
 import { IndependenceBanner } from '@/components/IndependenceBanner';
 import { SiteHeader } from '@/components/SiteHeader';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/lib/brand'
+import { SITE_URL } from '@/lib/seo';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  icons: { icon: '/favicon.svg' },
   title: BRAND_NAME,
   description:
     'Projeto independente sobre a eleição presidencial do Santos Futebol Clube em 2026.',

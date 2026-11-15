@@ -1,8 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { BRAND_NAME } from '@/lib/brand'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = { title: `Metodologia | ${BRAND_NAME}` }
+export const metadata: Metadata = pageMetadata({
+  title: `Metodologia | ${BRAND_NAME}`,
+  description: 'Como funcionam a votação informal, a verificação de fontes e a apuração dos resultados.',
+  path: '/metodologia',
+})
 
 const H2 = 'mb-3 text-2xl font-bold'
 

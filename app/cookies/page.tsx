@@ -1,7 +1,12 @@
 import type { Metadata } from 'next'
 import { BRAND_NAME } from '@/lib/brand'
+import { pageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = { title: `Cookies | ${BRAND_NAME}` }
+export const metadata: Metadata = pageMetadata({
+  title: `Cookies | ${BRAND_NAME}`,
+  description: 'Quais cookies o site usa e para que servem.',
+  path: '/cookies',
+})
 
 export default function CookiesPage() {
   return (

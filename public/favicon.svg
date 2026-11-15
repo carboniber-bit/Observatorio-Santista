@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>OS26</title>
+  <!-- Favicon: texto "OS" em <text> com fontes do sistema, sobre fundo preto, com linhas de campo. -->
+  <rect width="64" height="64" fill="#000000"/>
+  <line x1="6" y1="14" x2="58" y2="14" stroke="#a3a3a3" stroke-width="1.5"/>
+  <line x1="6" y1="50" x2="58" y2="50" stroke="#a3a3a3" stroke-width="1.5"/>
+  <text x="32" y="42" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="26" font-weight="700" fill="#ffffff">OS</text>
+</svg>

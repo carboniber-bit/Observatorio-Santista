@@ -123,6 +123,30 @@ describe('CorrectionForm', () => {
     expect((await screen.findByRole('alert')).textContent).toBe(generic)
   })
 
+  it('link inválido: mensagem, foco no campo e nenhum POST', () => {
+    const f = makeFetch()
+    render(<CorrectionForm fetchImpl={f.impl} />)
+    fill()
+    const link = screen.getByLabelText('Link da fonte (opcional)')
+    fireEvent.change(link, { target: { value: 'ftp://exemplo.test' } })
+    fireEvent.click(screen.getByRole('button', { name: SUBMIT }))
+    expect(screen.getByRole('alert').textContent).toBe('Informe um link válido (começando com http:// ou https://).')
+    expect(document.activeElement).toBe(link)
+    expect(f.calls).toHaveLength(0)
+  })
+
+  it('e-mail inválido: mensagem, foco no campo e nenhum POST', () => {
+    const f = makeFetch()
+    render(<CorrectionForm fetchImpl={f.impl} />)
+    fill()
+    const email = screen.getByLabelText('E-mail para retorno (opcional)')
+    fireEvent.change(email, { target: { value: 'sem-arroba' } })
+    fireEvent.click(screen.getByRole('button', { name: SUBMIT }))
+    expect(screen.getByRole('alert').textContent).toBe('Informe um e-mail válido.')
+    expect(document.activeElement).toBe(email)
+    expect(f.calls).toHaveLength(0)
+  })
+
   it('clique duplo envia um único POST', async () => {
     let release: () => void = () => {}
     const hold = new Promise<void>((resolve) => {

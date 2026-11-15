@@ -5,12 +5,15 @@ import { ComparatorTable } from '@/components/ComparatorTable'
 import { BRAND_NAME } from '@/lib/brand'
 import { buildComparison } from '@/lib/editorial/comparison'
 import { getCandidates } from '@/lib/editorial/queries'
+import { pageMetadata } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: `Comparador | ${BRAND_NAME}`,
-}
+  description: 'Compare propostas com fonte pública verificada dos candidatos, lado a lado.',
+  path: '/comparador',
+})
 
 type SearchParams = Promise<{ [key: string]: string | string[] | undefined }>
 

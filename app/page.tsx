@@ -1,9 +1,19 @@
+import type { Metadata } from 'next'
 import { HomeView, type HomeProposal } from '@/components/HomeView'
 import { getPublishedNews } from '@/lib/editorial/content'
 import { getCandidates, getPublishedProposals } from '@/lib/editorial/queries'
 import { getResults } from '@/lib/results'
+import { JsonLd } from '@/components/JsonLd'
+import { BRAND_NAME } from '@/lib/brand'
+import { pageMetadata, websiteJsonLd } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = pageMetadata({
+  title: BRAND_NAME,
+  description: 'Projeto independente sobre a eleição presidencial do Santos Futebol Clube em 2026.',
+  path: '/',
+})
 
 async function safe<T>(fn: () => Promise<T>): Promise<T | null> {
   try {
@@ -33,11 +43,14 @@ export default async function HomePage() {
         }),
   ])
   return (
-    <HomeView
-      summary={summary}
-      candidates={candidates}
-      news={newsAll === null ? null : newsAll.slice(0, 3)}
-      proposals={proposals}
-    />
+    <>
+      <JsonLd data={websiteJsonLd()} />
+      <HomeView
+        summary={summary}
+        candidates={candidates}
+        news={newsAll === null ? null : newsAll.slice(0, 3)}
+        proposals={proposals}
+      />
+    </>
   )
 }
