@@ -3,6 +3,7 @@ import {
   MSG_DENIED,
   MSG_GENERIC,
   MSG_NO_SOURCE,
+  MSG_PENDING_QUOTE,
   MSG_REASON,
   analysisSchema,
   candidateSchema,
@@ -36,7 +37,10 @@ export interface AdminDb {
     fn: UpdateRpc,
     args: { id: string; patch: Row; reason: string; sourceId?: string },
   ): Promise<void>
+  // Fontes com trecho comprobatório: não vazio e sem a marca "(citação a conferir no original)".
   countSourcesWithExcerpt(proposalId: string): Promise<number>
+  // Fontes cujo trecho ainda tem a marca de citação a conferir.
+  countPendingQuoteSources(proposalId: string): Promise<number>
   // Devolve quantas linhas foram atualizadas (0 = pedido inexistente ou sem permissão).
   markCorrectionHandled(id: string, handledAtIso: string): Promise<number>
   // published_at atual da notícia/análise (null se ainda não publicada).
@@ -59,6 +63,7 @@ export function friendlyError(err: unknown): string {
   const text = String((err as { message?: unknown })?.message ?? err ?? '')
   const code = String((err as { code?: unknown })?.code ?? '')
   if (/publicada sem ao menos uma fonte/i.test(text)) return MSG_NO_SOURCE
+  if (/citacao a conferir/i.test(text)) return MSG_PENDING_QUOTE
   if (/ficar sem trecho|nao pode mudar de proposta|manter ao menos uma fonte/i.test(text)) {
     return 'Mantenha o trecho comprobatório da fonte: uma fonte de proposta publicada não pode ficar sem trecho.'
   }
@@ -146,7 +151,7 @@ export function makeAdminCore(deps: AdminCoreDeps) {
       }
       // Pré-checagem amigável; a regra R18/R19 do banco continua como barreira final.
       if (status !== 'retirada' && (await db.countSourcesWithExcerpt(pid)) < 1) {
-        return fail(MSG_NO_SOURCE)
+        return fail((await db.countPendingQuoteSources(pid)) > 0 ? MSG_PENDING_QUOTE : MSG_NO_SOURCE)
       }
       await db.update('admin_update_proposal', {
         id: pid,

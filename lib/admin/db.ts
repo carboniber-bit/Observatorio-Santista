@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { hasPendingQuoteMark, isVerifiedExcerpt } from '../editorial/pending-quote'
 import type { AdminDb, InsertTable, UpdateRpc } from './core'
 
 // Adaptador do AdminDb sobre o cliente Supabase da SESSÃO do admin (nunca service
@@ -23,9 +24,15 @@ export function makeSupabaseAdminDb(getClient: () => SupabaseClient): AdminDb {
         .select('excerpt')
         .eq('proposal_id', proposalId)
       if (error) throw error
-      return ((data ?? []) as { excerpt: string | null }[]).filter(
-        (s) => (s.excerpt ?? '').trim().length > 0,
-      ).length
+      return ((data ?? []) as { excerpt: string | null }[]).filter((s) => isVerifiedExcerpt(s.excerpt)).length
+    },
+    async countPendingQuoteSources(proposalId) {
+      const { data, error } = await getClient()
+        .from('sources')
+        .select('excerpt')
+        .eq('proposal_id', proposalId)
+      if (error) throw error
+      return ((data ?? []) as { excerpt: string | null }[]).filter((s) => hasPendingQuoteMark(s.excerpt)).length
     },
     async markCorrectionHandled(id, handledAtIso) {
       const { data, error } = await getClient()

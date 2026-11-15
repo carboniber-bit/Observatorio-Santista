@@ -26,7 +26,7 @@ Estas rotinas NÃO foram executadas por quem escreveu este checklist (sem npm, D
 - [ ] Nenhuma página pública contém "melhor candidato", "mais preparado" ou "mais promissor" (nem flexões). Verificação: `e2e/neutrality.spec.ts`, ou em cada página `/` , `/candidatos/*`, `/comparador`, `/noticias`, `/analises` (e cada análise), `/historico`, `/sobre`, `/metodologia`, `/privacidade`, `/cookies`, `/votar`, `/resultados`, `/corrigir`: Ctrl+F pelos três radicais.
 - [ ] Candidato sem proposta publicada em um tema mostra "Não foi localizada proposta pública verificável." (e não um campo em branco), nos 4 perfis.
 - [ ] `/votar` lista os candidatos em ordem alfabética, Branco/Indeciso por último, e `/comparador` abre com os 4 selecionados.
-- [ ] `/resultados` não tem ranking nem destaque: barras em ordem fixa, aviso de "Amostra pequena" quando há poucos votos, texto de que não é pesquisa científica.
+- [ ] `/resultados` mostra as barras ordenadas pelo número de votos (é dado da simulação, não ranking editorial): sem selo, cor ou texto de destaque para o primeiro colocado, aviso de "Amostra pequena" quando há poucos votos e texto de que não é pesquisa científica.
 - [ ] Auditoria final de seções: depois do último conteúdo publicado, repita os três primeiros itens desta seção com o conteúdo definitivo e registre abaixo o número de propostas publicadas por candidato (diferenças são permitidas, desde que a ausência apareça como "não localizada"):
 
   | Candidato | Propostas publicadas | Temas sem proposta |
@@ -54,6 +54,7 @@ Estas rotinas NÃO foram executadas por quem escreveu este checklist (sem npm, D
     and not exists (select 1 from public.sources s
                     where s.proposal_id = p.id and length(trim(coalesce(s.excerpt,''))) > 0);
   ```
+- [ ] A publicação recusa trecho marcado: no ambiente de teste, tente publicar uma proposta cuja única fonte tem "(citação a conferir no original)" no trecho; o painel deve mostrar: Trecho ainda marcado como "citação a conferir": confira no original e remova a marca antes de publicar. (Barreira também no banco: `supabase/migrations/0007_publish_guards.sql`, testada em `supabase/tests/007_publish_guards.test.sql`.)
 - [ ] Nenhum trecho ainda marcado "(citação a conferir no original)" em conteúdo publicado. Esperado: 0 linhas.
   ```sql
   select s.proposal_id, s.url from public.sources s
@@ -138,7 +139,7 @@ Não é automatizado porque exige senha e TOTP reais de admin (aal2).
 ## 4. Privacidade e LGPD
 
 - [ ] Nenhum cookie além de `os26_voter` (HttpOnly, SameSite=Lax, Secure em produção). Verificação: DevTools > Application > Cookies em `/`, `/votar`, `/resultados`, depois de votar.
-- [ ] `/privacidade` e `/cookies` descrevem exatamente o que o site faz (hash diário de 7 dias, `voter_tokens` mantido até o fim do período, e-mail de correção apagado em 90 dias).
+- [ ] `/privacidade` e `/cookies` descrevem exatamente o que o site faz (hash diário ligado ao voto por até 7 dias, `voter_tokens` mantido até o fim do período, e-mail de correção apagado em 90 dias, texto e link de correções mantidos sem prazo, IP não armazenado pela aplicação mas possível nos logs de Vercel, Supabase e Cloudflare, fotos de candidatos de hosts externos quando cadastradas).
 - [ ] `NEXT_PUBLIC_CONTACT_EMAIL` está definido e `/privacidade` mostra um link `mailto:` funcional (caixa monitorada: ____________).
 - [ ] Nenhum script de terceiros além do Turnstile da Cloudflare: DevTools > Network em `/votar` e `/resultados`.
 - [ ] Logs da Vercel não contêm IPs, cookies nem tokens de voto (Vercel > Logs, filtrar por `/api/vote`). Os logs de plataforma da Vercel guardam IP de requisição por conta própria; registre isso como limitação conhecida se a política de privacidade não o mencionar: ____________
@@ -197,7 +198,7 @@ Não é automatizado porque exige senha e TOTP reais de admin (aal2).
 - [ ] `SUPABASE_SERVICE_ROLE_KEY`, `TURNSTILE_SECRET_KEY`, `VOTE_HASH_SECRET` e `CRON_SECRET` não aparecem no código-fonte da página (Ctrl+U) nem em `git log -p` (`git log -p | grep -c service_role` deve mostrar apenas menções a nomes, nunca valores). Somente variáveis `NEXT_PUBLIC_*` podem ir ao navegador.
 - [ ] `git ls-files | grep -E "^\.env"` lista apenas `.env.example`.
 - [ ] Turnstile de produção usa chaves reais, não as de teste: a chave do site em produção não começa com `1x0000`/`2x0000`/`3x0000`.
-- [ ] Limite de 6 envios de correção por hora por hash responde `429` (comportamento testado em `lib/corrections`); teste manual opcional enviando 6 pedidos em sequência.
+- [ ] O 6º pedido de correção na mesma hora por hash responde `429` (testado em `lib/corrections`); teste manual opcional enviando 6 pedidos em sequência. Votos não dão 429: o 6º voto por hora é gravado como suspeito.
 
 ## 6. Acessibilidade e responsividade
 

@@ -230,6 +230,17 @@ describe('POST /api/vote', () => {
     expect(await res.json()).toEqual({ status: 'invalid' })
   })
 
+  it('erro VT410 do banco (encerrou na virada) dá 410 de votação encerrada, não 500', async () => {
+    const { handler } = setup({ castError: Object.assign(new Error('encerrada'), { code: 'VT410' }) })
+    const res = await handler.POST(voteRequest(valid))
+    expect(res.status).toBe(410)
+    expect(await res.json()).toEqual({
+      status: 'closed',
+      message:
+        'A votação foi encerrada em 11/12/2026 às 23:59 (horário de Brasília). Os resultados estão congelados.',
+    })
+  })
+
   it('outro erro do banco dá 500 sem vazar detalhes', async () => {
     const { handler } = setup({ castError: new Error('senha do banco: xyz') })
     const res = await handler.POST(voteRequest(valid))

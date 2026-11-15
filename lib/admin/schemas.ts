@@ -2,6 +2,8 @@ import { z } from 'zod'
 
 // Mensagens em pt-BR; nenhuma expõe detalhes internos.
 export const MSG_REASON = 'Informe o motivo da alteração.'
+export const MSG_PENDING_QUOTE =
+  'Trecho ainda marcado como "citação a conferir": confira no original e remova a marca antes de publicar.'
 export const MSG_NO_SOURCE = 'Proposta sem fonte com trecho comprobatório: não pode ser publicada.'
 export const MSG_DENIED = 'Acesso negado.'
 export const MSG_GENERIC = 'Não foi possível concluir a operação. Nada foi alterado.'

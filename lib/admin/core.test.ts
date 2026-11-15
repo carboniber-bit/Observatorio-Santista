@@ -9,7 +9,7 @@ const NOW = new Date('2026-11-20T12:00:00Z')
 type Call = { op: string; args: unknown }
 
 // Dublê escrito à mão: registra cada chamada e deixa configurar contagem de fontes e falhas.
-function setup(opts: { sourcesWithExcerpt?: number; dbError?: unknown; adminError?: unknown; handledRows?: number; publishedAt?: string | null } = {}) {
+function setup(opts: { sourcesWithExcerpt?: number; pendingSources?: number; dbError?: unknown; adminError?: unknown; handledRows?: number; publishedAt?: string | null } = {}) {
   const calls: Call[] = []
   const state = { status: 'em_revisao' }
   const fail = () => {
@@ -30,6 +30,10 @@ function setup(opts: { sourcesWithExcerpt?: number; dbError?: unknown; adminErro
     async countSourcesWithExcerpt(proposalId) {
       calls.push({ op: 'count', args: { proposalId } })
       return opts.sourcesWithExcerpt ?? 0
+    },
+    async countPendingQuoteSources(proposalId) {
+      calls.push({ op: 'pending', args: { proposalId } })
+      return opts.pendingSources ?? 0
     },
     async markCorrectionHandled(id, handledAtIso) {
       calls.push({ op: 'handled', args: { id, handledAtIso } })
@@ -151,6 +155,32 @@ describe('publishProposal', () => {
     })
     expect(state.status).toBe('em_revisao')
     expect(calls.filter((c) => c.op === 'update')).toHaveLength(0)
+  })
+
+  it('trecho ainda marcado "citação a conferir" é recusado com mensagem própria e nada é gravado', async () => {
+    const msg =
+      'Trecho ainda marcado como "citação a conferir": confira no original e remova a marca antes de publicar.'
+    for (const run of [
+      (c: ReturnType<typeof setup>['core']) => c.publishProposal(UUID, 'revisão concluída'),
+      (c: ReturnType<typeof setup>['core']) => c.correctProposal(UUID, 'ajuste de texto'),
+    ]) {
+      const { core, calls, state } = setup({ sourcesWithExcerpt: 0, pendingSources: 1 })
+      expect(await run(core)).toEqual({ ok: false, error: msg })
+      expect(state.status).toBe('em_revisao')
+      expect(calls.filter((c) => c.op === 'update')).toHaveLength(0)
+    }
+  })
+
+  it('a barreira do banco para trecho "a conferir" também vira a mensagem amigável', async () => {
+    const { core } = setup({
+      sourcesWithExcerpt: 1,
+      dbError: { code: 'P0001', message: 'proposta nao pode ser publicada com trecho ainda marcado como citacao a conferir no original' },
+    })
+    const result = await core.publishProposal(UUID, 'revisão concluída')
+    expect(result).toEqual({
+      ok: false,
+      error: 'Trecho ainda marcado como "citação a conferir": confira no original e remova a marca antes de publicar.',
+    })
   })
 
   it('com fonte, chama a RPC com status publicada e o motivo', async () => {

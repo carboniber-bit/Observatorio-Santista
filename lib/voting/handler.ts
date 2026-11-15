@@ -163,9 +163,10 @@ export function createVoteHandler(deps: VoteDeps) {
           flag,
         })
       } catch (err) {
-        if ((err as { code?: unknown } | null)?.code === '23503') {
-          return json({ status: 'invalid' }, 400)
-        }
+        const code = (err as { code?: unknown } | null)?.code
+        if (code === '23503') return json({ status: 'invalid' }, 400)
+        // VT410: cast_vote recusou por já ter passado o encerramento (corrida na virada).
+        if (code === 'VT410') return json({ status: 'closed', message: MSG_CLOSED }, 410)
         throw err
       }
 

@@ -51,10 +51,21 @@ export default function PrivacidadePage() {
             <li>Cookie aleatório essencial <code>os26_voter</code>, usado para limitar um voto por navegador.</li>
             <li>
               Hash temporário, irreversível e com sal diário, derivado de dados de rede, usado apenas para detectar
-              abuso e apagado após 7 dias. O endereço IP não é armazenado.
+              abuso. Durante até 7 dias ele fica ligado ao registro do voto correspondente; depois é apagado e o voto
+              permanece sem nenhuma ligação com ele. A aplicação não armazena o endereço IP; os provedores de hospedagem
+              e segurança (Vercel, Supabase e Cloudflare) podem manter endereços IP em seus próprios registros, conforme
+              as políticas de cada um.
             </li>
             <li>O token do desafio Turnstile é processado pela Cloudflare para verificar que o acesso não é automatizado.</li>
-            <li>Pedidos de correção: o texto, um link opcional e um e-mail opcional, além de um hash temporário do remetente, apagado após 7 dias.</li>
+            <li>
+              Pedidos de correção: o texto, um link opcional e um e-mail opcional, além de um hash temporário do
+              remetente, apagado após 7 dias. O texto e o link do pedido são mantidos sem prazo de eliminação definido
+              (o e-mail segue o prazo da seção Retenção).
+            </li>
+            <li>
+              Fotos de candidatos, quando cadastradas, podem ser carregadas de endereços externos; o servidor que as
+              hospeda recebe, como em qualquer imagem da web, o endereço IP de quem abre a página.
+            </li>
             <li>
               Hash do token do cookie: o servidor guarda apenas um hash (nunca o valor bruto) do token aleatório do
               cookie, com a data de criação truncada ao dia, para impedir votos duplicados. Esse registro não é apagado
@@ -84,6 +95,7 @@ export default function PrivacidadePage() {
           <ul className="list-disc space-y-2 pl-6">
             <li>Hash temporário: apagado após 7 dias.</li>
             <li>E-mail opcional de correção: apagado 90 dias após o tratamento do pedido.</li>
+            <li>Texto e link de pedidos de correção: mantidos, sem prazo de eliminação definido.</li>
             <li>Votos: mantidos de forma anônima (candidato, autodeclaração de sócio, sinalização de validade e momento do voto), sem ligação com uma pessoa.</li>
           </ul>
         </section>

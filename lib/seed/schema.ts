@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { PENDING_QUOTE_MARK } from '../editorial/pending-quote.ts'
 
 // Esquema e validação do conteúdo inicial (content/seed/*.json).
 // Imports relativos com extensão .ts: o módulo roda sob Node 22 (strip-types) e no Next.
@@ -33,7 +34,7 @@ export const SOURCE_KINDS = [
 
 export const RESEARCH_CONSULTED_ON = '2026-11-08'
 export const MAX_QUOTE_WORDS = 14
-export const PENDING_NOTE_SUFFIX = ' (citação a conferir no original)'
+export const PENDING_NOTE_SUFFIX = ` ${PENDING_QUOTE_MARK}`
 export const FORBIDDEN_PHRASES = ['melhor candidato', 'mais preparado', 'mais promissor'] as const
 
 export type SeedSource = {

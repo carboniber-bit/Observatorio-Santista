@@ -160,6 +160,12 @@ describe('privacidade', () => {
     expect(text).not.toContain('agregada')
     expect(text).toContain('nunca o valor bruto')
     expect(text).toContain('não é apagado pela rotina de 7 dias')
+    expect(text).not.toContain('O endereço IP não é armazenado')
+    expect(text).toContain('A aplicação não armazena o endereço IP')
+    expect(text).toContain('Vercel, Supabase e Cloudflare')
+    expect(text).toContain('ligado ao registro do voto')
+    expect(text).toContain('sem prazo de eliminação definido')
+    expect(text).toContain('Fotos de candidatos')
     expect(text).toContain('hash temporário do remetente')
   })
 

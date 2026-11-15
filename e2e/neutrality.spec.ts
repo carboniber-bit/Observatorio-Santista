@@ -14,7 +14,7 @@ const SKIP_NO_SUPABASE =
   'defina NEXT_PUBLIC_SUPABASE_URL e NEXT_PUBLIC_SUPABASE_ANON_KEY (projeto Supabase de teste, com supabase/seed.sql aplicado)'
 
 // Chaves de teste documentadas pela Cloudflare: sempre aprovam. Nunca use em produção.
-const TURNSTILE_TEST_SITE_KEY = '1x00000000000000AAAAAAAAAAAAAAAAAA'
+const TURNSTILE_TEST_SITE_KEY = '1x00000000000000000000AA'
 const TURNSTILE_TEST_SECRET = '1x0000000000000000000000000000000AA'
 const hasTurnstileTestKeys =
   process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY === TURNSTILE_TEST_SITE_KEY &&

@@ -20,7 +20,7 @@ Nota sobre a Vercel: o plano Hobby é para uso pessoal e não comercial. O site 
 
    Se o painel mostrar só as chaves novas (`publishable`/`secret`), procure a aba "Legacy API keys" para copiar `anon` e `service_role`, que são as usadas por este código.
 
-## 2. Migrações do banco (0001 a 0006)
+## 2. Migrações do banco (0001 a 0007)
 
 No terminal, na pasta do projeto:
 
@@ -30,11 +30,11 @@ supabase link --project-ref SEU_PROJECT_REF   # o código fica na URL do painel 
 supabase db push
 ```
 
-O `db push` aplica, em ordem, `supabase/migrations/0001_core.sql` até `0006_sources_guard.sql` (tabelas, regras editoriais, voto, resultados, limpeza e proteção de fontes). Ele pede a senha do banco da etapa 1. Confira em **Table Editor** que existem `candidates`, `themes`, `proposals`, `sources`, `vote_events` etc.
+O `db push` aplica, em ordem, `supabase/migrations/0001_core.sql` até `0007_publish_guards.sql` (tabelas, regras editoriais, voto, resultados, limpeza, proteção de fontes e barreiras finais de publicação e encerramento). Ele pede a senha do banco da etapa 1. Confira em **Table Editor** que existem `candidates`, `themes`, `proposals`, `sources`, `vote_events` etc.
 
 Repita com `supabase link` apontando para o projeto de teste quando for preparar o ambiente de teste.
 
-**Migrações só andam para frente.** Não edite um arquivo já aplicado: crie `0007_...sql`.
+**Migrações só andam para frente.** Não edite um arquivo já aplicado: crie `0008_...sql`.
 
 ## 3. Dados iniciais (`supabase/seed.sql`)
 
@@ -72,7 +72,7 @@ Em **Authentication** (os nomes de menu podem variar um pouco conforme o painel)
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase > Settings > API > service_role (SECRETA) | do projeto de teste | do projeto real |
 | `VOTE_HASH_SECRET` | você gera (abaixo) | um valor | OUTRO valor |
 | `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile (seção 6) | `1x0000000000000000000000000000000AA` (teste) | chave secreta real |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile (seção 6) | `1x00000000000000AAAAAAAAAAAAAAAAAA` (teste) | chave do site real |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile (seção 6) | `1x00000000000000000000AA` (teste) | chave do site real |
 | `NEXT_PUBLIC_SITE_URL` | seu endereço público | URL do preview, ou deixe vazio | `https://seudominio.com.br` |
 | `NEXT_PUBLIC_CONTACT_EMAIL` | e-mail que você monitora | pode repetir | e-mail real (obrigação da LGPD) |
 | `CRON_SECRET` | você gera (abaixo) | um valor | OUTRO valor |
@@ -155,7 +155,7 @@ Hoje `content/seed/*.json` está **vazio**: nenhuma proposta foi cadastrada, e o
 ## 12. Reversão (rollback)
 
 - **Código/site:** Vercel > Deployments > escolha a implantação anterior boa > **Instant Rollback** (ou "Promote to Production"). Demora segundos. Não mexe no banco.
-- **Banco:** migrações só avançam. Para desfazer uma mudança de estrutura, escreva uma nova migração que a reverta (`0007_...sql`) e rode `supabase db push`. Para um desastre de dados, restaure o backup em Supabase > Database > **Backups** (planos pagos: restauração para um ponto no tempo) ou, no plano gratuito, importe o arquivo gerado antes com `supabase db dump -f backup.sql` (faça um dump antes de mudanças grandes e no encerramento da votação; guarde fora do Git, pois ele contém os votos). Restaurar volta TODOS os dados ao ponto escolhido, inclusive votos posteriores: use só em último caso.
+- **Banco:** migrações só avançam. Para desfazer uma mudança de estrutura, escreva uma nova migração que a reverta (`0008_...sql`) e rode `supabase db push`. Para um desastre de dados, restaure o backup em Supabase > Database > **Backups** (planos pagos: restauração para um ponto no tempo) ou, no plano gratuito, importe o arquivo gerado antes com `supabase db dump -f backup.sql` (faça um dump antes de mudanças grandes e no encerramento da votação; guarde fora do Git, pois ele contém os votos). Restaurar volta TODOS os dados ao ponto escolhido, inclusive votos posteriores: use só em último caso.
 - Variáveis erradas: corrija em Environment Variables e faça Redeploy.
 
 ## 13. Teste de fumaça pós-implantação
@@ -196,7 +196,7 @@ Veja `README.md`, seção "Auditoria de neutralidade". Use sempre o projeto Supa
 
 **O botão "Registrar voto" fica desabilitado.** Falta responder "Sim/Não", escolher uma opção, ou o Turnstile não concluiu. Verifique: a chave do site está no build (redeploy depois de mudar), o domínio está na lista de hostnames do widget, e nenhum bloqueador de anúncios impede `challenges.cloudflare.com`. Com chaves de teste em um site real o desafio "aprova" qualquer um: confira que Production usa as chaves reais.
 
-**Erro 429 ao enviar correção ou votar.** Foi atingido o limite por hora (5 pedidos de correção por hash; no voto, o 6º da mesma rede em 1 hora é marcado como suspeito e não conta). Espere uma hora. Em redes compartilhadas (universidade, escritório) isso pode afetar mais de uma pessoa; por isso o voto suspeito só é descartado dos totais e contado à parte.
+**Erro 429 ao enviar um pedido de correção.** Foi atingido o limite de 5 pedidos por hora por hash; espere uma hora. O voto NÃO devolve 429: o 6º voto na mesma hora, vindo do mesmo hash de rede, é gravado como suspeito (a pessoa ainda vê "Voto registrado") e fica fora dos totais, aparecendo só em "Votos descartados". Em redes compartilhadas (universidade, escritório) isso pode afetar mais de uma pessoa; por isso o voto suspeito é apenas contado à parte, nunca apagado.
 
 **A votação abriu na hora errada / ficou fechada.** `VOTING_OPENS_AT` sem `-03:00`, com formato inválido (inválido = fechada) ou com a data no futuro. Corrija a variável e faça redeploy.
 
