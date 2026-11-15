@@ -189,7 +189,7 @@ export function VoteForm({
     <form onSubmit={handleSubmit} className="space-y-8" noValidate>
       <div className="space-y-3 border border-gray-2 bg-gray-1 p-4 text-sm text-gray-4">
         <p>
-          Seu voto é anônimo: não coletamos nome, CPF, e-mail, telefone nem endereço IP. Guardamos
+          Seu voto é anônimo: não armazenamos nome, CPF, e-mail, telefone nem endereço IP. Guardamos
           apenas um código aleatório no seu navegador (cookie essencial) para evitar voto duplicado
           e um identificador temporário e irreversível, apagado em 7 dias, para detectar abuso.
         </p>
