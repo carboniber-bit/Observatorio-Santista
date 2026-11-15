@@ -1,14 +1,14 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest'
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
-import { fileURLToPath } from 'node:url'
 import { loadSeed } from '../lib/seed/load.ts'
 import { parseArgs } from './seed.ts'
 import { insertSeed, type SeedDb } from '../lib/seed/insert.ts'
 import { validateEntries, THEME_SLUGS, CANDIDATE_SLUGS, RESEARCH_CONSULTED_ON } from '../lib/seed/schema.ts'
 
-const ROOT = fileURLToPath(new URL('..', import.meta.url))
+const ROOT = process.cwd()
 
 // Fixture só de teste (nunca em content/seed).
 function entry(over: Record<string, unknown> = {}, sourceOver: Record<string, unknown> = {}) {
