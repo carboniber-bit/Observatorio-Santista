@@ -66,21 +66,45 @@ function isCalendarDate(value: string): boolean {
   return date.getUTCFullYear() === y && date.getUTCMonth() === mo - 1 && date.getUTCDate() === d
 }
 
-// Maior trecho entre aspas duplas (retas ou curvas), em palavras.
+const QUOTE_CHARS = /["“”«»]/g
+
+// Aspas (retas, curvas e angulares) formam uma única classe de delimitadores, pareados em
+// sequência: 1ª abre, 2ª fecha. Devolve o maior trecho entre aspas em palavras, ou -1 se a
+// contagem de aspas for ímpar (não pareada).
 export function longestQuotedRun(text: string): number {
+  const parts = text.split(QUOTE_CHARS)
+  if (parts.length % 2 === 0) return -1
   let max = 0
-  for (const m of text.matchAll(/"([^"]*)"|“([^”]*)”/g)) {
-    const inner = m[1] ?? m[2] ?? ''
-    const words = inner.split(/\s+/).filter(Boolean).length
+  for (let i = 1; i < parts.length; i += 2) {
+    const words = parts[i].split(/\s+/).filter(Boolean).length
     if (words > max) max = words
   }
   return max
 }
 
+function normalizeText(v: string): string {
+  return v.replace(/[\s\u00a0]+/g, ' ').toLocaleLowerCase('pt-BR')
+}
+
+const FORBIDDEN_PATTERNS = [
+  /(?<!\p{L})mais preparad[oa]s?(?!\p{L})/u,
+  /(?<!\p{L})melhor(es)? candidat[oa]s?(?!\p{L})/u,
+  /(?<!\p{L})mais promissor(es|a|as)?(?!\p{L})/u,
+]
+
 const nonBlank = z.string().refine((v) => v.trim().length > 0, 'não pode ser vazio')
 const dateField = z.string().refine(isCalendarDate, 'data inválida (use aaaa-mm-dd)')
 
-const quoteGuard = (v: string) => longestQuotedRun(v) <= MAX_QUOTE_WORDS
+const quoteGuard = (v: string) => {
+  const n = longestQuotedRun(v)
+  return n >= 0 && n <= MAX_QUOTE_WORDS
+}
+const quoteMessage = `aspas não pareadas ou trecho entre aspas com mais de ${MAX_QUOTE_WORDS} palavras (parafraseie)`
+const noForbidden = (v: string) => {
+  const t = normalizeText(v)
+  return !FORBIDDEN_PATTERNS.some((r) => r.test(t))
+}
+const forbiddenMessage = `expressão avaliativa proibida (${FORBIDDEN_PHRASES.join(', ')})`
 
 export function makeSeedEntrySchema(requireConsultedOn: string = RESEARCH_CONSULTED_ON) {
   const source = z
@@ -93,12 +117,15 @@ export function makeSeedEntrySchema(requireConsultedOn: string = RESEARCH_CONSUL
         `consultedOn deve ser ${requireConsultedOn}`,
       ),
       kind: z.enum(SOURCE_KINDS),
-      excerpt: nonBlank.refine(
-        quoteGuard,
-        `trecho entre aspas com mais de ${MAX_QUOTE_WORDS} palavras (parafraseie)`,
-      ),
+      excerpt: nonBlank
+        .refine(quoteGuard, quoteMessage)
+        .refine(noForbidden, forbiddenMessage),
     })
     .strict()
+    .refine(
+      (v) => !isCalendarDate(v.publishedOn) || !isCalendarDate(v.consultedOn) || v.publishedOn <= v.consultedOn,
+      { path: ['publishedOn'], message: 'publishedOn não pode ser posterior a consultedOn' },
+    )
 
   return z
     .object({
@@ -106,11 +133,8 @@ export function makeSeedEntrySchema(requireConsultedOn: string = RESEARCH_CONSUL
       themeSlug: z.enum(THEME_SLUGS),
       description: nonBlank
         .refine((v) => v.length <= 2000, 'description deve ter no máximo 2000 caracteres')
-        .refine(quoteGuard, `trecho entre aspas com mais de ${MAX_QUOTE_WORDS} palavras (parafraseie)`)
-        .refine((v) => {
-          const lower = v.toLocaleLowerCase('pt-BR')
-          return !FORBIDDEN_PHRASES.some((p) => lower.includes(p))
-        }, `expressão avaliativa proibida (${FORBIDDEN_PHRASES.join(', ')})`),
+        .refine(quoteGuard, quoteMessage)
+        .refine(noForbidden, forbiddenMessage),
       sourceKind: z.enum(SOURCE_KINDS),
       referenceYear: z.number().int().min(2000).max(2026).nullable(),
       sources: z.array(source).min(1, 'ao menos uma fonte é obrigatória'),

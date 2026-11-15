@@ -22,7 +22,8 @@ export type SourceRow = {
 export interface SeedDb {
   findCandidateId(slug: string): Promise<string | null>
   findThemeId(slug: string): Promise<string | null>
-  proposalExists(key: { candidate_id: string; theme_id: string; description: string }): Promise<boolean>
+  findProposalId(key: { candidate_id: string; theme_id: string; description: string }): Promise<string | null>
+  listSourceUrls(proposal_id: string): Promise<string[]>
   insertProposal(row: ProposalRow): Promise<{ id: string }>
   insertSource(row: SourceRow): Promise<unknown>
 }
@@ -30,7 +31,8 @@ export interface SeedDb {
 export type InsertResult = { inserted: number; skipped: number }
 
 // Insere sempre com status 'em_revisao' (não configurável). Idempotente: pula quando já existe
-// proposta com mesmo candidato + tema + descrição. Aborta antes de qualquer escrita se a
+// proposta com mesmo candidato + tema + descrição (reutiliza o id e insere só as fontes cuja
+// URL ainda falta, o que recupera falhas parciais). Aborta antes de qualquer escrita se a
 // validação falhar ou faltar candidato/tema no banco.
 export async function insertSeed(
   entries: SeedEntry[],
@@ -61,30 +63,40 @@ export async function insertSeed(
     const candidate_id = candidateIds.get(e.candidateSlug) as string
     const theme_id = themeIds.get(e.themeSlug) as string
     const description = e.description.trim()
-    if (await db.proposalExists({ candidate_id, theme_id, description })) {
-      skipped++
-      continue
+    let proposalId = await db.findProposalId({ candidate_id, theme_id, description })
+    let existingUrls = new Set<string>()
+    let added = 0
+    if (proposalId) {
+      existingUrls = new Set((await db.listSourceUrls(proposalId)).map((u) => u.trim()))
+    } else {
+      const row = await db.insertProposal({
+        candidate_id,
+        theme_id,
+        description,
+        source_kind: e.sourceKind,
+        reference_year: e.referenceYear,
+        status: 'em_revisao',
+      })
+      proposalId = row.id
+      added++
     }
-    const { id } = await db.insertProposal({
-      candidate_id,
-      theme_id,
-      description,
-      source_kind: e.sourceKind,
-      reference_year: e.referenceYear,
-      status: 'em_revisao',
-    })
     for (const s of e.sources) {
+      const url = s.url.trim()
+      if (existingUrls.has(url)) continue
       await db.insertSource({
-        proposal_id: id,
-        url: s.url.trim(),
+        proposal_id: proposalId,
+        url,
         outlet: s.outlet.trim(),
         published_on: s.publishedOn,
         consulted_on: s.consultedOn,
         kind: s.kind,
         excerpt: s.excerpt.trim(),
       })
+      existingUrls.add(url)
+      added++
     }
-    inserted++
+    if (added > 0) inserted++
+    else skipped++
   }
   return { inserted, skipped }
 }

@@ -1,3 +1,4 @@
+import { readdirSync } from 'node:fs'
 import { pathToFileURL } from 'node:url'
 import { loadSeed } from '../lib/seed/load.ts'
 import { insertSeed, type SeedDb } from '../lib/seed/insert.ts'
@@ -10,8 +11,11 @@ export function parseArgs(argv: string[]): { dryRun: boolean; dir: string } {
   let dir = 'content/seed'
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--dry-run') dryRun = true
-    else if (argv[i] === '--dir' && argv[i + 1]) dir = argv[++i]
-    else if (argv[i].startsWith('--dir=')) dir = argv[i].slice('--dir='.length)
+    else if (argv[i] === '--dir') {
+      if (!argv[i + 1]) throw new Error('A opção --dir exige um diretório.')
+      dir = argv[++i]
+    } else if (argv[i].startsWith('--dir=')) dir = argv[i].slice('--dir='.length)
+    else throw new Error(`Opção desconhecida: ${argv[i]}. Use --dry-run e --dir <diretório>.`)
   }
   return { dryRun, dir }
 }
@@ -30,7 +34,7 @@ async function makeDb(): Promise<SeedDb> {
   return {
     findCandidateId: (slug) => idBySlug('candidates', slug),
     findThemeId: (slug) => idBySlug('themes', slug),
-    async proposalExists(key) {
+    async findProposalId(key) {
       const { data, error } = await client
         .from('proposals')
         .select('id')
@@ -39,7 +43,12 @@ async function makeDb(): Promise<SeedDb> {
         .eq('description', key.description)
         .limit(1)
       fail('consulta proposals', error)
-      return (data?.length ?? 0) > 0
+      return (data?.[0]?.id as string | undefined) ?? null
+    },
+    async listSourceUrls(proposalId) {
+      const { data, error } = await client.from('sources').select('url').eq('proposal_id', proposalId)
+      fail('consulta sources', error)
+      return (data ?? []).map((r) => r.url as string)
     },
     async insertProposal(row) {
       const { data, error } = await client.from('proposals').insert(row).select('id').single()
@@ -56,6 +65,9 @@ async function makeDb(): Promise<SeedDb> {
 
 export async function main(argv: string[]): Promise<number> {
   const { dryRun, dir } = parseArgs(argv)
+  if (readdirSync(dir).filter((f) => f.endsWith('.json')).length === 0) {
+    console.warn(`Aviso: nenhum arquivo .json encontrado em ${dir}.`)
+  }
   const entries = loadSeed(dir)
   const hasEnv = Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY)
   console.log(`Entradas válidas em ${dir}: ${entries.length}`)

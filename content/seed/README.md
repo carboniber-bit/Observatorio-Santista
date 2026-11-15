@@ -44,16 +44,16 @@ Este exemplo existe só neste README. Nunca o coloque em um JSON de `content/see
 
 ## Regras
 
-- Parafraseie. Citação literal entre aspas (retas ou curvas) com **no máximo 14 palavras**; acima disso o
-  validador rejeita, em `description` e em `excerpt`.
+- Parafraseie. Citação literal entre aspas (retas, curvas ou « ») com **no máximo 14 palavras**; acima disso, ou com
+  aspas não pareadas, o validador rejeita, em `description` e em `excerpt`.
 - Toda entrada tem **ao menos uma fonte, com todos os campos preenchidos**: `url` (http:// ou https://),
-  `outlet`, `publishedOn`, `consultedOn`, `kind`, `excerpt`. Datas em `aaaa-mm-dd`.
+  `outlet`, `publishedOn`, `consultedOn`, `kind`, `excerpt`. Datas em `aaaa-mm-dd`; `publishedOn` não pode ser posterior a `consultedOn`.
 - `consultedOn` deve ser `2026-11-08` (lote desta pesquisa). Outra data é rejeitada por padrão.
 - Material de 2023 ou anterior: `"referenceYear": 2023` (inteiro entre 2000 e 2026). Sem ano de referência: `null`.
 - Chaves desconhecidas são rejeitadas. Em especial, **`status` não existe no JSON**: tudo é importado como
   `em_revisao`, sem exceção.
 - `description` até 2000 caracteres, sem juízo de valor ("melhor candidato", "mais preparado",
-  "mais promissor" são rejeitados). Entradas repetidas (mesmo candidato, tema e descrição) são rejeitadas.
+  "mais promissor" e variações de gênero/número são rejeitados, em `description` e `excerpt`). Entradas repetidas (mesmo candidato, tema e descrição) são rejeitadas.
 - Tema sem proposta fica **sem entrada**. Não escreva "sem proposta" nem texto de preenchimento.
 - Publicação só pelo painel `/admin`, depois de verificar o trecho (`excerpt`) na fonte original.
 
@@ -72,4 +72,4 @@ npm run seed -- --dir content/seed # diretório alternativo
 
 A gravação usa `NEXT_PUBLIC_SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` (nunca versionar; o script não as
 imprime). Sem essas variáveis o script roda em dry-run. A importação é idempotente: proposta com mesmo
-candidato, tema e descrição já existente é pulada. Requer Node 22 (`--experimental-strip-types`).
+candidato, tema e descrição já existente é pulada. Requer Node 22.6 ou superior (`--experimental-strip-types`).

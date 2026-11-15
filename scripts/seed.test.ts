@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { loadSeed } from '../lib/seed/load.ts'
+import { parseArgs } from './seed.ts'
 import { insertSeed, type SeedDb } from '../lib/seed/insert.ts'
 import { validateEntries, THEME_SLUGS, CANDIDATE_SLUGS, RESEARCH_CONSULTED_ON } from '../lib/seed/schema.ts'
 
@@ -49,7 +50,7 @@ const file = (entries: unknown[], slug = 'marcelo-teixeira') => ({
 })
 const words = (n: number) => Array.from({ length: n }, (_, i) => `p${i}`).join(' ')
 
-function fakeDb(opts: { missingCandidate?: string } = {}) {
+function fakeDb(opts: { missingCandidate?: string; missingTheme?: string; failSourceOnce?: boolean } = {}) {
   const proposals: Record<string, unknown>[] = []
   const sources: Record<string, unknown>[] = []
   const db: SeedDb = {
@@ -57,18 +58,26 @@ function fakeDb(opts: { missingCandidate?: string } = {}) {
       return slug === opts.missingCandidate ? null : `c-${slug}`
     },
     async findThemeId(slug) {
-      return `t-${slug}`
+      return slug === opts.missingTheme ? null : `t-${slug}`
     },
-    async proposalExists(k) {
-      return proposals.some(
+    async findProposalId(k) {
+      const i = proposals.findIndex(
         (p) => p.candidate_id === k.candidate_id && p.theme_id === k.theme_id && p.description === k.description,
       )
+      return i < 0 ? null : `p${i + 1}`
+    },
+    async listSourceUrls(id) {
+      return sources.filter((x) => x.proposal_id === id).map((x) => x.url as string)
     },
     async insertProposal(row) {
       proposals.push(row)
       return { id: `p${proposals.length}` }
     },
     async insertSource(row) {
+      if (opts.failSourceOnce) {
+        opts.failSourceOnce = false
+        throw new Error('falha simulada')
+      }
       sources.push(row)
       return null
     },
@@ -173,6 +182,38 @@ describe('validação', () => {
   })
 })
 
+describe('guarda de aspas e frases', () => {
+  const ex = (text: string) => () => validateEntries([entry({ description: text })])
+  it('pares mistos, guillemets e não pareadas', () => {
+    expect(() => ex(`Disse "${words(15)}” hoje.`)()).toThrow()
+    expect(ex(`Disse “${words(14)}" hoje.`)()).toHaveLength(1)
+    expect(() => ex(`Disse «${words(15)}» hoje.`)()).toThrow()
+    expect(ex(`Disse «${words(14)}» hoje.`)()).toHaveLength(1)
+    expect(() => ex(`Disse "${words(20)} sem fechar.`)()).toThrow()
+    expect(() => ex(`Disse “${words(3)} e "${words(3)}" fim.`)()).toThrow()
+    expect(() => validateEntries([entry({}, { excerpt: 'aspas " soltas' })])).toThrow()
+  })
+  it('frases proibidas: variações, NBSP, caixa, também no excerpt', () => {
+    for (const t of ['Mais  preparada', 'MAIS\u00a0PREPARADOS', 'os melhores candidatos', 'a melhor candidata', 'mais promissoras', 'mais promissor']) {
+      expect(() => validateEntries([entry({ description: `Ele é ${t} do clube.` })])).toThrow()
+      expect(() => validateEntries([entry({}, { excerpt: `Ele é ${t} do clube.` })])).toThrow()
+    }
+    expect(validateEntries([entry({ description: 'Quer melhorar o candidato a sócio.' })])).toHaveLength(1)
+  })
+  it('publishedOn não pode ser posterior a consultedOn', () => {
+    expect(() => validateEntries([entry({}, { publishedOn: '2026-11-09' })])).toThrow()
+    expect(validateEntries([entry({}, { publishedOn: '2026-11-08' })])).toHaveLength(1)
+  })
+})
+
+describe('parseArgs', () => {
+  it('rejeita opções desconhecidas e --dir sem valor', () => {
+    expect(() => parseArgs(['--dry-ruN'])).toThrow()
+    expect(() => parseArgs(['--dir'])).toThrow()
+    expect(parseArgs(['--dry-run', '--dir', 'x'])).toEqual({ dryRun: true, dir: 'x' })
+  })
+})
+
 describe('insertSeed', () => {
   it('insere só como em_revisao, com fontes, e é idempotente', async () => {
     const f = fakeDb()
@@ -189,6 +230,27 @@ describe('insertSeed', () => {
     const bad = [{ ...entry(), status: 'publicada' }]
     await expect(insertSeed(bad as never, { db: f.db })).rejects.toThrow()
     expect(f.proposals).toHaveLength(0)
+  })
+  it('recupera falha parcial: reexecução reutiliza a proposta e completa só as fontes faltantes', async () => {
+    const f = fakeDb({ failSourceOnce: true })
+    const two = entry({}, {})
+    two.sources.push({ ...two.sources[0], url: 'https://exemplo.invalid/outra' })
+    const entries = validateEntries([two])
+    await expect(insertSeed(entries, { db: f.db })).rejects.toThrow()
+    expect(f.proposals).toHaveLength(1)
+    expect(f.sources).toHaveLength(0)
+    expect(await insertSeed(entries, { db: f.db })).toEqual({ inserted: 1, skipped: 0 })
+    expect(f.proposals).toHaveLength(1)
+    expect(f.sources).toHaveLength(2)
+    expect(await insertSeed(entries, { db: f.db })).toEqual({ inserted: 0, skipped: 1 })
+    expect(f.sources).toHaveLength(2)
+  })
+  it('aborta sem escrever se faltar tema', async () => {
+    const f = fakeDb({ missingTheme: 'financas' })
+    const entries = validateEntries([entry(), entry({ themeSlug: 'financas' })])
+    await expect(insertSeed(entries, { db: f.db })).rejects.toThrow()
+    expect(f.proposals).toHaveLength(0)
+    expect(f.sources).toHaveLength(0)
   })
   it('aborta sem escrever se faltar candidato ou se a validação falhar', async () => {
     const f = fakeDb({ missingCandidate: 'mauricio-maruca' })
