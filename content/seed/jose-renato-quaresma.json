@@ -3,18 +3,52 @@
   "entries": [
     {
       "candidateSlug": "jose-renato-quaresma",
-      "themeSlug": "financas",
-      "description": "Declara-se favorável à SAF e diz defender uma SAF \"de verdade\".",
+      "themeSlug": "base-formacao",
+      "description": "Segundo a Gazeta Esportiva, defende a construção gradual de um centro de formação para a base.",
       "sourceKind": "reportagem",
       "referenceYear": 2026,
       "sources": [
         {
-          "url": "https://www.uol.com.br/esporte/futebol/ultimas-noticias/2026/09/28/jose-renato-quaresma-e-o-4-candidato-confirmado-a-presidencia-do-santos.ghtm",
-          "outlet": "UOL",
-          "publishedOn": "2026-09-28",
+          "url": "https://www.gazetaesportiva.com/times/santos/eleicao-santos-2026-candidatos-propostas-votacao/",
+          "outlet": "Gazeta Esportiva",
+          "publishedOn": "2026-11-12",
           "consultedOn": "2026-11-16",
           "kind": "reportagem",
-          "excerpt": "\"Eu sou a favor da SAF, mas uma SAF de verdade.\" (citação a conferir no original)"
+          "excerpt": "\"a construção gradual de um centro de formação para a base\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "jose-renato-quaresma",
+      "themeSlug": "governanca-transparencia",
+      "description": "Segundo a Gazeta Esportiva, propõe divulgar um balanço dos primeiros 100 dias.",
+      "sourceKind": "reportagem",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.gazetaesportiva.com/times/santos/eleicao-santos-2026-candidatos-propostas-votacao/",
+          "outlet": "Gazeta Esportiva",
+          "publishedOn": "2026-11-12",
+          "consultedOn": "2026-11-16",
+          "kind": "reportagem",
+          "excerpt": "\"a divulgação de um balanço dos primeiros 100 dias\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "jose-renato-quaresma",
+      "themeSlug": "financas",
+      "description": "Segundo a Gazeta Esportiva, defende avaliar os impactos de uma eventual SAF antes de decidir.",
+      "sourceKind": "reportagem",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.gazetaesportiva.com/times/santos/eleicao-santos-2026-candidatos-propostas-votacao/",
+          "outlet": "Gazeta Esportiva",
+          "publishedOn": "2026-11-12",
+          "consultedOn": "2026-11-16",
+          "kind": "reportagem",
+          "excerpt": "\"avaliação criteriosa dos impactos financeiros, jurídicos e patrimoniais\""
         }
       ]
     }

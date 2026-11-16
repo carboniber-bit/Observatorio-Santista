@@ -11,7 +11,6 @@ import {
   THEME_SLUGS,
   CANDIDATE_SLUGS,
   RESEARCH_CONSULTED_ON,
-  PENDING_NOTE_SUFFIX,
   longestQuotedRun,
 } from '../lib/seed/schema.ts'
 import { hasPendingQuoteMark } from '../lib/editorial/pending-quote.ts'
@@ -94,24 +93,25 @@ function fakeDb(opts: { missingCandidate?: string; missingTheme?: string; failSo
 }
 
 describe('arquivos reais', () => {
-  it('carrega as 4 propostas em revisão, todas com a nota de citação pendente e citações de até 14 palavras', () => {
+  it('carrega as 11 propostas conferidas com o texto das matérias, citações de até 14 palavras e sem nota pendente', () => {
     const dir = path.join(ROOT, 'content/seed')
     const entries = loadSeed(dir)
-    expect(entries).toHaveLength(4)
-    expect(entries.map((e) => e.candidateSlug).sort()).toEqual([...CANDIDATE_SLUGS].sort())
+    expect(entries).toHaveLength(11)
+    const per = (slug: string) => entries.filter((e) => e.candidateSlug === slug).length
+    expect(per('marcelo-teixeira')).toBe(2)
+    expect(per('ivan-luduvice')).toBe(3)
+    expect(per('jose-renato-quaresma')).toBe(3)
+    expect(per('mauricio-maruca')).toBe(3)
     for (const slug of CANDIDATE_SLUGS) {
       const raw = JSON.parse(readFileSync(path.join(dir, `${slug}.json`), 'utf8'))
       expect(raw.candidateSlug).toBe(slug)
-      expect(raw.entries).toHaveLength(1)
     }
     for (const e of entries) {
       expect(e.referenceYear).toBe(2026)
-      expect(e.sourceKind).toBe('reportagem')
+      expect(['reportagem', 'entrevista_direta']).toContain(e.sourceKind)
       for (const s of e.sources) {
-        expect(s.kind).toBe('reportagem')
         expect(s.consultedOn).toBe('2026-11-16')
-        expect(s.excerpt.endsWith(PENDING_NOTE_SUFFIX)).toBe(true)
-        expect(hasPendingQuoteMark(s.excerpt)).toBe(true)
+        expect(hasPendingQuoteMark(s.excerpt)).toBe(false)
         expect(longestQuotedRun(s.excerpt)).toBeGreaterThan(0)
         expect(longestQuotedRun(s.excerpt)).toBeLessThanOrEqual(14)
       }
