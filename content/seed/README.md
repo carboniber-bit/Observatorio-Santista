@@ -76,7 +76,7 @@ candidato, tema e descrição já existente é pulada. Requer Node 22.6 ou super
 
 ## Lote de 16/11/2026
 
-As 11 entradas atuais (2 de Teixeira, 3 de Luduvice, 3 de Quaresma, 3 de Maruca) foram conferidas com o texto integral
+As 19 entradas atuais (2 de Teixeira, 6 de Luduvice, 5 de Quaresma, 6 de Maruca) foram conferidas com o texto integral
 das matérias (Gazeta Esportiva 12/11/2026, LANCE! 14/10/2026 e Estadão 17/08/2026), copiado por quem opera o projeto em
 16/11/2026: cada trecho entre aspas aparece literalmente no texto recebido. `consultedOn` é essa data. As propostas
 entram como `em_revisao`; antes de publicar em `/admin/propostas`, abra o link e confirme que o trecho continua igual.

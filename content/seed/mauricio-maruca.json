@@ -51,6 +51,57 @@
           "excerpt": "\"propõe uma auditoria externa no início do mandato\""
         }
       ]
+    },
+    {
+      "candidateSlug": "mauricio-maruca",
+      "themeSlug": "futebol",
+      "description": "Segundo a Gazeta Esportiva, propõe maior autonomia técnica para o futebol.",
+      "sourceKind": "reportagem",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.gazetaesportiva.com/times/santos/eleicao-santos-2026-candidatos-propostas-votacao/",
+          "outlet": "Gazeta Esportiva",
+          "publishedOn": "2026-11-12",
+          "consultedOn": "2026-11-16",
+          "kind": "reportagem",
+          "excerpt": "\"maior autonomia técnica para o futebol\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "mauricio-maruca",
+      "themeSlug": "base-formacao",
+      "description": "Defende que a base pertença ao clube e não seja loteada.",
+      "sourceKind": "entrevista_direta",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.estadao.com.br/esportes/futebol/opositor-de-teixeira-propoe-saf-100-do-santos-e-nao-garante-renovacao-com-neymar/",
+          "outlet": "Estadão",
+          "publishedOn": "2026-08-17",
+          "consultedOn": "2026-11-16",
+          "kind": "entrevista_direta",
+          "excerpt": "\"A base não pode ser loteada como está.\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "mauricio-maruca",
+      "themeSlug": "receitas-marketing",
+      "description": "Propõe uma gestão de marketing moderna, eficiente e tecnológica.",
+      "sourceKind": "entrevista_direta",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.estadao.com.br/esportes/futebol/opositor-de-teixeira-propoe-saf-100-do-santos-e-nao-garante-renovacao-com-neymar/",
+          "outlet": "Estadão",
+          "publishedOn": "2026-08-17",
+          "consultedOn": "2026-11-16",
+          "kind": "entrevista_direta",
+          "excerpt": "\"uma gestão de marketing moderna, eficiente e tecnológica\""
+        }
+      ]
     }
   ]
 }

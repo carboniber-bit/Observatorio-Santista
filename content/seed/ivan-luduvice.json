@@ -51,6 +51,57 @@
           "excerpt": "\"Eu sou a favor da SAF.\""
         }
       ]
+    },
+    {
+      "candidateSlug": "ivan-luduvice",
+      "themeSlug": "governanca-transparencia",
+      "description": "Propõe uma ampla reforma administrativa.",
+      "sourceKind": "entrevista_direta",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.lance.com.br/santos/ivan-luduvice-detalha-propostas-para-o-santos-veja-planos-para-a-vila-neymar-e-saf.html",
+          "outlet": "LANCE!",
+          "publishedOn": "2026-10-14",
+          "consultedOn": "2026-11-16",
+          "kind": "entrevista_direta",
+          "excerpt": "\"uma ampla reforma administrativa\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "ivan-luduvice",
+      "themeSlug": "futebol",
+      "description": "Defende combinar jogadores da base com contratações pontuais.",
+      "sourceKind": "entrevista_direta",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.lance.com.br/santos/ivan-luduvice-detalha-propostas-para-o-santos-veja-planos-para-a-vila-neymar-e-saf.html",
+          "outlet": "LANCE!",
+          "publishedOn": "2026-10-14",
+          "consultedOn": "2026-11-16",
+          "kind": "entrevista_direta",
+          "excerpt": "\"uma mescla de atletas da nossa base com contratações pontuais\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "ivan-luduvice",
+      "themeSlug": "socios-torcida",
+      "description": "Propõe uma reformulação completa do programa Sócio-Rei.",
+      "sourceKind": "entrevista_direta",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.lance.com.br/santos/ivan-luduvice-detalha-propostas-para-o-santos-veja-planos-para-a-vila-neymar-e-saf.html",
+          "outlet": "LANCE!",
+          "publishedOn": "2026-10-14",
+          "consultedOn": "2026-11-16",
+          "kind": "entrevista_direta",
+          "excerpt": "\"uma reformulação completa do Sócio-Rei\""
+        }
+      ]
     }
   ]
 }

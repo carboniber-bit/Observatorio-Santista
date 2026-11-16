@@ -51,6 +51,40 @@
           "excerpt": "\"avaliação criteriosa dos impactos financeiros, jurídicos e patrimoniais\""
         }
       ]
+    },
+    {
+      "candidateSlug": "jose-renato-quaresma",
+      "themeSlug": "futebol",
+      "description": "Segundo a Gazeta Esportiva, propõe uma filosofia permanente de futebol integrada entre as categorias.",
+      "sourceKind": "reportagem",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.gazetaesportiva.com/times/santos/eleicao-santos-2026-candidatos-propostas-votacao/",
+          "outlet": "Gazeta Esportiva",
+          "publishedOn": "2026-11-12",
+          "consultedOn": "2026-11-16",
+          "kind": "reportagem",
+          "excerpt": "\"a criação de uma filosofia permanente de futebol\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "jose-renato-quaresma",
+      "themeSlug": "governanca-transparencia",
+      "description": "Segundo a Gazeta Esportiva, propõe um Escritório de Gestão Estratégica.",
+      "sourceKind": "reportagem",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.gazetaesportiva.com/times/santos/eleicao-santos-2026-candidatos-propostas-votacao/",
+          "outlet": "Gazeta Esportiva",
+          "publishedOn": "2026-11-12",
+          "consultedOn": "2026-11-16",
+          "kind": "reportagem",
+          "excerpt": "\"um Escritório de Gestão Estratégica\""
+        }
+      ]
     }
   ]
 }
