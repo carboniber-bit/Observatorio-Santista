@@ -8,7 +8,7 @@ export const BUTTON =
 export const BUTTON_SECONDARY =
   'min-h-11 border border-ink bg-paper px-5 py-2 font-semibold text-ink hover:bg-gray-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink'
 
-export type Flash = { ok?: string | string[]; erro?: string | string[] }
+export type Flash = { ok?: string | string[]; erro?: string | string[]; detalhe?: string | string[] }
 
 // Mensagens fixas por código: o texto nunca vem da URL.
 const OK_MESSAGES: Record<string, string> = {
@@ -47,6 +47,9 @@ export function FlashMessage({ params }: { params: Flash }) {
   return erro ? (
     <p role="alert" className="mb-6 border-2 border-ink bg-gray-1 p-3 font-semibold">
       {erro}
+      {errKey === 'invalido' && first(params.detalhe) ? (
+        <span className="mt-2 block text-sm font-normal">Detalhe técnico: {first(params.detalhe)?.slice(0, 160)}</span>
+      ) : null}
     </p>
   ) : (
     <p role="status" className="mb-6 border border-ink bg-gray-1 p-3 font-semibold">

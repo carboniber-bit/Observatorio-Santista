@@ -30,7 +30,10 @@ function back(path: string, result: AdminResult, okCode: string, editId?: string
   if (result.ok) {
     params.set('ok', okCode)
   } else {
-    params.set('erro', errorCode(result.error))
+    const code = errorCode(result.error)
+    params.set('erro', code)
+    // Diagnóstico só para erros de validação (texto gerado pelo próprio código, nunca do banco).
+    if (code === 'invalido') params.set('detalhe', result.error.slice(0, 160))
     if (editId) params.set('editar', editId)
   }
   redirect(`${path}?${params.toString()}`)
