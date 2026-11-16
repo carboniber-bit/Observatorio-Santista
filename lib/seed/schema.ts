@@ -32,7 +32,7 @@ export const SOURCE_KINDS = [
   'declaracao_como_presidente',
 ] as const
 
-export const RESEARCH_CONSULTED_ON = '2026-11-08'
+export const RESEARCH_CONSULTED_ON = '2026-11-16'
 export const MAX_QUOTE_WORDS = 14
 export const PENDING_NOTE_SUFFIX = ` ${PENDING_QUOTE_MARK}`
 export const FORBIDDEN_PHRASES = ['melhor candidato', 'mais preparado', 'mais promissor'] as const

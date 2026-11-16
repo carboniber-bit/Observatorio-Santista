@@ -1,4 +1,22 @@
 {
   "candidateSlug": "marcelo-teixeira",
-  "entries": []
+  "entries": [
+    {
+      "candidateSlug": "marcelo-teixeira",
+      "themeSlug": "receitas-marketing",
+      "description": "Segundo a Gazeta Esportiva, a gestão ampliou a parceria com Neymar Pai, anunciado como CEO até dezembro.",
+      "sourceKind": "reportagem",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.gazetaesportiva.com/times/santos/eleicao-santos-2026-candidatos-propostas-votacao/",
+          "outlet": "Gazeta Esportiva",
+          "publishedOn": "2026-11-12",
+          "consultedOn": "2026-11-16",
+          "kind": "reportagem",
+          "excerpt": "\"Sua gestão também ampliou a parceria com Neymar Pai, anunciado como CEO até dezembro.\" (citação a conferir no original)"
+        }
+      ]
+    }
+  ]
 }

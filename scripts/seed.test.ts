@@ -6,7 +6,15 @@ import path from 'node:path'
 import { loadSeed } from '../lib/seed/load.ts'
 import { parseArgs } from './seed.ts'
 import { insertSeed, type SeedDb } from '../lib/seed/insert.ts'
-import { validateEntries, THEME_SLUGS, CANDIDATE_SLUGS, RESEARCH_CONSULTED_ON } from '../lib/seed/schema.ts'
+import {
+  validateEntries,
+  THEME_SLUGS,
+  CANDIDATE_SLUGS,
+  RESEARCH_CONSULTED_ON,
+  PENDING_NOTE_SUFFIX,
+  longestQuotedRun,
+} from '../lib/seed/schema.ts'
+import { hasPendingQuoteMark } from '../lib/editorial/pending-quote.ts'
 
 const ROOT = process.cwd()
 
@@ -86,12 +94,28 @@ function fakeDb(opts: { missingCandidate?: string; missingTheme?: string; failSo
 }
 
 describe('arquivos reais', () => {
-  it('carrega os 4 arquivos (vazios) e cobre os 4 slugs', () => {
+  it('carrega as 4 propostas em revisão, todas com a nota de citação pendente e citações de até 14 palavras', () => {
     const dir = path.join(ROOT, 'content/seed')
-    expect(loadSeed(dir)).toEqual([])
+    const entries = loadSeed(dir)
+    expect(entries).toHaveLength(4)
+    expect(entries.map((e) => e.candidateSlug).sort()).toEqual([...CANDIDATE_SLUGS].sort())
     for (const slug of CANDIDATE_SLUGS) {
       const raw = JSON.parse(readFileSync(path.join(dir, `${slug}.json`), 'utf8'))
-      expect(raw).toEqual({ candidateSlug: slug, entries: [] })
+      expect(raw.candidateSlug).toBe(slug)
+      expect(raw.entries).toHaveLength(1)
+    }
+    for (const e of entries) {
+      expect(e.referenceYear).toBe(2026)
+      expect(e.sourceKind).toBe('reportagem')
+      for (const s of e.sources) {
+        expect(s.kind).toBe('reportagem')
+        expect(s.consultedOn).toBe('2026-11-16')
+        expect(s.excerpt.endsWith(PENDING_NOTE_SUFFIX)).toBe(true)
+        expect(hasPendingQuoteMark(s.excerpt)).toBe(true)
+        expect(longestQuotedRun(s.excerpt)).toBeGreaterThan(0)
+        expect(longestQuotedRun(s.excerpt)).toBeLessThanOrEqual(14)
+      }
+      expect(longestQuotedRun(e.description)).toBeLessThanOrEqual(14)
     }
   })
   it('THEME_SLUGS tem 9 e bate com supabase/seed.sql', () => {
@@ -127,7 +151,8 @@ describe('validação', () => {
     expect(() => withDir(file([entry({ extra: 1 })]), (d) => loadSeed(d))).toThrow()
     expect(() => validateEntries([entry({}, { extra: 1 })])).toThrow()
   })
-  it('rejeita consultedOn diferente de 2026-11-08 por padrão', () => {
+  it('rejeita consultedOn diferente de 2026-11-16 por padrão', () => {
+    expect(RESEARCH_CONSULTED_ON).toBe('2026-11-16')
     expect(() => validateEntries([entry({}, { consultedOn: '2026-11-09' })])).toThrow()
     expect(validateEntries([entry({}, { consultedOn: '2026-11-09' })], { requireConsultedOn: '2026-11-09' })).toHaveLength(1)
   })
@@ -201,8 +226,8 @@ describe('guarda de aspas e frases', () => {
     expect(validateEntries([entry({ description: 'Quer melhorar o candidato a sócio.' })])).toHaveLength(1)
   })
   it('publishedOn não pode ser posterior a consultedOn', () => {
-    expect(() => validateEntries([entry({}, { publishedOn: '2026-11-09' })])).toThrow()
-    expect(validateEntries([entry({}, { publishedOn: '2026-11-08' })])).toHaveLength(1)
+    expect(() => validateEntries([entry({}, { publishedOn: '2026-11-17' })])).toThrow()
+    expect(validateEntries([entry({}, { publishedOn: '2026-11-16' })])).toHaveLength(1)
   })
 })
 

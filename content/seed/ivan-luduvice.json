@@ -1,4 +1,22 @@
 {
   "candidateSlug": "ivan-luduvice",
-  "entries": []
+  "entries": [
+    {
+      "candidateSlug": "ivan-luduvice",
+      "themeSlug": "receitas-marketing",
+      "description": "Menciona a criação do Santos Pay, um banco digital.",
+      "sourceKind": "reportagem",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.lance.com.br/santos/ivan-luduvice-detalha-propostas-para-o-santos-veja-planos-para-a-vila-neymar-e-saf.html",
+          "outlet": "LANCE!",
+          "publishedOn": "2026-10-14",
+          "consultedOn": "2026-11-16",
+          "kind": "reportagem",
+          "excerpt": "\"A gente traz a questão do Santos Pay, que é o banco digital.\" (citação a conferir no original)"
+        }
+      ]
+    }
+  ]
 }

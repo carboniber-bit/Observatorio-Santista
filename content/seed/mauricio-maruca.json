@@ -1,4 +1,22 @@
 {
   "candidateSlug": "mauricio-maruca",
-  "entries": []
+  "entries": [
+    {
+      "candidateSlug": "mauricio-maruca",
+      "themeSlug": "financas",
+      "description": "Defende um modelo de SAF em que o Santos mantenha 100%.",
+      "sourceKind": "reportagem",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://www.estadao.com.br/esportes/futebol/opositor-de-teixeira-propoe-saf-100-do-santos-e-nao-garante-renovacao-com-neymar/",
+          "outlet": "Estadão",
+          "publishedOn": "2026-08-17",
+          "consultedOn": "2026-11-16",
+          "kind": "reportagem",
+          "excerpt": "\"Minha ideia é que seja uma SAF em que o Santos tenha 100%.\" (citação a conferir no original)"
+        }
+      ]
+    }
+  ]
 }

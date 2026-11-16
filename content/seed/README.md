@@ -1,7 +1,7 @@
 # Conteúdo inicial (propostas em revisão)
 
-Um arquivo JSON por candidato em `content/seed/`. Hoje todos têm `"entries": []`: **nenhuma proposta foi
-cadastrada ainda**. Só entra aqui o que veio de fonte verificável. Nunca preencha com texto de enchimento.
+Um arquivo JSON por candidato em `content/seed/`. Hoje há 4 entradas (uma por candidato), todas em revisão
+(ver "Lote de 16/11/2026"). Só entra aqui o que veio de fonte verificável. Nunca preencha com texto de enchimento.
 
 ## Formato
 
@@ -32,7 +32,7 @@ Tipos (`sourceKind` e `kind` da fonte): `documento_da_chapa`, `entrevista_direta
       "url": "https://exemplo.invalid/materia",
       "outlet": "EXEMPLO — não publicar",
       "publishedOn": "2026-11-01",
-      "consultedOn": "2026-11-08",
+      "consultedOn": "2026-11-16",
       "kind": "reportagem",
       "excerpt": "EXEMPLO — não publicar"
     }
@@ -48,7 +48,7 @@ Este exemplo existe só neste README. Nunca o coloque em um JSON de `content/see
   aspas não pareadas, o validador rejeita, em `description` e em `excerpt`.
 - Toda entrada tem **ao menos uma fonte, com todos os campos preenchidos**: `url` (http:// ou https://),
   `outlet`, `publishedOn`, `consultedOn`, `kind`, `excerpt`. Datas em `aaaa-mm-dd`; `publishedOn` não pode ser posterior a `consultedOn`.
-- `consultedOn` deve ser `2026-11-08` (lote desta pesquisa). Outra data é rejeitada por padrão.
+- `consultedOn` deve ser `2026-11-16` (data do lote atual, `RESEARCH_CONSULTED_ON`). Outra data é rejeitada por padrão.
 - Material de 2023 ou anterior: `"referenceYear": 2023` (inteiro entre 2000 e 2026). Sem ano de referência: `null`.
 - Chaves desconhecidas são rejeitadas. Em especial, **`status` não existe no JSON**: tudo é importado como
   `em_revisao`, sem exceção.
@@ -73,3 +73,10 @@ npm run seed -- --dir content/seed # diretório alternativo
 A gravação usa `NEXT_PUBLIC_SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` (nunca versionar; o script não as
 imprime). Sem essas variáveis o script roda em dry-run. A importação é idempotente: proposta com mesmo
 candidato, tema e descrição já existente é pulada. Requer Node 22.6 ou superior (`--experimental-strip-types`).
+
+## Lote de 16/11/2026
+
+As 4 entradas atuais vieram de um resumo de pesquisa de terceiros, não verificado por nós. Ninguém do projeto abriu
+as páginas: `consultedOn` é a data em que os dados foram recebidos. Links e citações precisam ser abertos e
+confirmados pelo admin, que depois atualiza a fonte (data de consulta) em `/admin/fontes` e remove a nota
+` (citação a conferir no original)`. Até lá as propostas ficam `em_revisao` e não podem ser publicadas.
