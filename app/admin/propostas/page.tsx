@@ -107,36 +107,31 @@ export default async function ProposalsPage({
                 </p>
                 <details>
                   <summary className="min-h-11 cursor-pointer py-2 font-semibold">Mudar situação</summary>
-                  <form action={formProposalStatus} className="mt-3 max-w-xl space-y-4">
-                    <input type="hidden" name="id" value={p.id} />
-                    <ReasonField id={`r-${p.id}`} />
-                    {(p.sources ?? []).length > 0 ? (
-                      <div>
-                        <label htmlFor={`s-${p.id}`} className="mb-1 block font-semibold">
-                          Fonte que fundamenta a mudança (opcional)
-                        </label>
-                        <select id={`s-${p.id}`} name="sourceId" defaultValue="" className={FIELD}>
-                          <option value="">Nenhuma</option>
-                          {(p.sources ?? []).map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.url}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    ) : null}
-                    <div className="flex flex-wrap gap-3">
-                      <button type="submit" name="op" value="publish" className={BUTTON}>
-                        Publicar
+                  {(['publish', 'correct', 'retract'] as const).map((op) => (
+                    <form key={op} action={formProposalStatus} className="mt-3 max-w-xl space-y-4">
+                      <input type="hidden" name="id" value={p.id} />
+                      <input type="hidden" name="op" value={op} />
+                      <ReasonField id={`r-${p.id}-${op}`} />
+                      {(p.sources ?? []).length > 0 ? (
+                        <div>
+                          <label htmlFor={`s-${p.id}-${op}`} className="mb-1 block font-semibold">
+                            Fonte que fundamenta a mudança (opcional)
+                          </label>
+                          <select id={`s-${p.id}-${op}`} name="sourceId" defaultValue="" className={FIELD}>
+                            <option value="">Nenhuma</option>
+                            {(p.sources ?? []).map((source) => (
+                              <option key={source.id} value={source.id}>
+                                {source.url}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : null}
+                      <button type="submit" className={op === 'publish' ? BUTTON : BUTTON_SECONDARY}>
+                        {op === 'publish' ? 'Publicar' : op === 'correct' ? 'Marcar como corrigida' : 'Retirar'}
                       </button>
-                      <button type="submit" name="op" value="correct" className={BUTTON_SECONDARY}>
-                        Marcar como corrigida
-                      </button>
-                      <button type="submit" name="op" value="retract" className={BUTTON_SECONDARY}>
-                        Retirar
-                      </button>
-                    </div>
-                  </form>
+                    </form>
+                  ))}
                 </details>
               </li>
             )
