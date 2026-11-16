@@ -25,6 +25,7 @@ const OK_MESSAGES: Record<string, string> = {
 const ERROR_MESSAGES: Record<string, string> = {
   motivo: 'Informe o motivo da alteração.',
   fonte: 'Proposta sem fonte com trecho comprobatório: não pode ser publicada.',
+  pendente: 'Trecho ainda marcado como "citação a conferir": confira no original e remova a marca antes de publicar.',
   trecho: 'Mantenha o trecho comprobatório da fonte: uma fonte de proposta publicada não pode ficar sem trecho.',
   acesso: 'Acesso negado.',
   duplicado: 'Já existe um registro com este identificador (slug).',

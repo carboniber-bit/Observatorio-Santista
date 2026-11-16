@@ -16,6 +16,7 @@ function str(fd: FormData, key: string): string {
 function errorCode(message: string): string {
   if (/motivo da altera/i.test(message)) return 'motivo'
   if (/sem fonte com trecho/i.test(message)) return 'fonte'
+  if (/cita[cç][aã]o a conferir/i.test(message)) return 'pendente'
   if (/Mantenha o trecho/i.test(message)) return 'trecho'
   if (/Acesso negado/i.test(message)) return 'acesso'
   if (/identificador \(slug\)/i.test(message) && /Já existe/.test(message)) return 'duplicado'
