@@ -1,10 +1,13 @@
 import { requireAdmin } from '@/lib/admin/auth'
-import { formProposalStatus, formSaveProposal } from '@/lib/admin/form-actions'
+import {
+  formCorrectProposal,
+  formPublishProposal,
+  formRetractProposal,
+  formSaveProposal,
+} from '@/lib/admin/form-actions'
 import { sourceKindLabel } from '@/lib/editorial/labels'
 import {
   BUTTON,
-  BUTTON_SECONDARY,
-  FIELD,
   Field,
   FlashMessage,
   PageShell,
@@ -14,6 +17,7 @@ import {
   statusLabel,
   type Flash,
 } from '../_ui'
+import { ProposalStatusForm } from './ProposalStatusForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -107,31 +111,13 @@ export default async function ProposalsPage({
                 </p>
                 <details>
                   <summary className="min-h-11 cursor-pointer py-2 font-semibold">Mudar situação</summary>
-                  {(['publish', 'correct', 'retract'] as const).map((op) => (
-                    <form key={op} action={formProposalStatus} className="mt-3 max-w-xl space-y-4">
-                      <input type="hidden" name="id" value={p.id} />
-                      <input type="hidden" name="op" value={op} />
-                      <ReasonField id={`r-${p.id}-${op}`} />
-                      {(p.sources ?? []).length > 0 ? (
-                        <div>
-                          <label htmlFor={`s-${p.id}-${op}`} className="mb-1 block font-semibold">
-                            Fonte que fundamenta a mudança (opcional)
-                          </label>
-                          <select id={`s-${p.id}-${op}`} name="sourceId" defaultValue="" className={FIELD}>
-                            <option value="">Nenhuma</option>
-                            {(p.sources ?? []).map((source) => (
-                              <option key={source.id} value={source.id}>
-                                {source.url}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      ) : null}
-                      <button type="submit" className={op === 'publish' ? BUTTON : BUTTON_SECONDARY}>
-                        {op === 'publish' ? 'Publicar' : op === 'correct' ? 'Marcar como corrigida' : 'Retirar'}
-                      </button>
-                    </form>
-                  ))}
+                  <ProposalStatusForm
+                    proposalId={p.id}
+                    sources={(p.sources ?? []).map((source) => ({ id: source.id, url: source.url }))}
+                    publishAction={formPublishProposal}
+                    correctAction={formCorrectProposal}
+                    retractAction={formRetractProposal}
+                  />
                 </details>
               </li>
             )
