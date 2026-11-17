@@ -7,7 +7,7 @@ const SIZES = ['base', 'lg', 'xl', 'xxl'] as const
 type Size = (typeof SIZES)[number]
 
 const BTN =
-  'inline-flex min-h-11 min-w-11 items-center justify-center rounded-full border border-gray-2 bg-paper px-3 text-sm font-semibold text-ink hover:bg-gray-1 disabled:opacity-40'
+  'inline-flex min-h-11 w-full items-center justify-center rounded-full border border-gray-2 bg-paper px-3 text-sm font-semibold text-ink hover:bg-gray-1 disabled:opacity-40 sm:w-auto sm:min-w-11'
 
 function read(key: string): string | null {
   try {
@@ -72,7 +72,7 @@ export function AccessibilityControls() {
   const themeLabel = theme === 'system' ? 'Automático' : theme === 'light' ? 'Claro' : 'Escuro'
 
   return (
-    <div role="group" aria-label="Acessibilidade e aparência" className="flex flex-wrap items-center gap-2">
+    <div role="group" aria-label="Acessibilidade e aparência" className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center">
       <button type="button" className={BTN} onClick={() => changeSize(-1)} disabled={size === 'base'} aria-label="Diminuir tamanho do texto">
         A−
       </button>

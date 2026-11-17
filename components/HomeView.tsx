@@ -23,7 +23,7 @@ export type HomeViewProps = {
 }
 
 const LINK_BUTTON =
-  'inline-flex min-h-11 items-center border border-ink px-5 py-2 font-semibold underline-offset-4 hover:underline'
+  'inline-flex min-h-11 items-center justify-center rounded-full border border-ink px-5 py-2 font-semibold underline-offset-4 hover:underline'
 
 function SectionError({ what }: { what: string }) {
   return (
@@ -77,14 +77,20 @@ export function HomeView({ summary, candidates, news, proposals }: HomeViewProps
         <p className="max-w-3xl">{HOME_PRESENTATION}</p>
       </header>
 
-      <section aria-labelledby="simulacao" className="space-y-4">
+      <section
+        aria-labelledby="simulacao"
+        className="space-y-5 rounded-3xl border-2 border-ink bg-gray-1 p-6 sm:p-8"
+      >
         <h2 id="simulacao" className="text-2xl font-bold">
           Simulação de intenção de voto
         </h2>
         <p>Votação espontânea e informal, sem valor de pesquisa científica.</p>
         <Simulation summary={summary} candidates={candidates} />
         <p className="flex flex-wrap gap-3">
-          <Link href="/votar" className={`${LINK_BUTTON} bg-ink text-paper`}>
+          <Link
+            href="/votar"
+            className="inline-flex min-h-16 w-full items-center justify-center rounded-full bg-ink px-10 py-3 text-xl font-bold text-paper shadow-md hover:opacity-90 sm:w-auto"
+          >
             Participe da simulação
           </Link>
           <Link href="/resultados" className={LINK_BUTTON}>

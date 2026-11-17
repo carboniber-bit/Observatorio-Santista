@@ -149,9 +149,50 @@ html[data-text-size="xxl"] { font-size: 150%; }
   }
 }
 
-html[data-contrast="high"] {
-  --gray-2: var(--ink);
-  --gray-3: var(--ink);
+/* Alto contraste: seletores com especificidade maior que as do tema, para valer no claro, no escuro
+   e no automático (prefers-color-scheme). */
+:root[data-contrast="high"] {
+  --ink: #000000;
+  --paper: #ffffff;
+  --gray-1: #ffffff;
+  --gray-2: #000000;
+  --gray-3: #000000;
+  --gray-4: #000000;
+  --accent: #0000cc;
+  --danger: #a00000;
+}
+
+:root[data-contrast="high"][data-theme="dark"] {
+  --ink: #ffffff;
+  --paper: #000000;
+  --gray-1: #000000;
+  --gray-2: #ffffff;
+  --gray-3: #ffffff;
+  --gray-4: #ffffff;
+  --accent: #ffff66;
+  --danger: #ff9a9a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-contrast="high"]:not([data-theme="light"]) {
+    --ink: #ffffff;
+    --paper: #000000;
+    --gray-1: #000000;
+    --gray-2: #ffffff;
+    --gray-3: #ffffff;
+    --gray-4: #ffffff;
+    --accent: #ffff66;
+    --danger: #ff9a9a;
+  }
+}
+
+:root[data-contrast="high"] a { text-decoration: underline; }
+:root[data-contrast="high"] button,
+:root[data-contrast="high"] input:not([type="checkbox"]):not([type="radio"]),
+:root[data-contrast="high"] select,
+:root[data-contrast="high"] textarea {
+  border-width: 2px;
+  border-color: var(--ink);
 }
 
 /* Logo preto com fundo transparente: no escuro, inverte para branco. */
