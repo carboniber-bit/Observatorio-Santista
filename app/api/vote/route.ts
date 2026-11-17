@@ -23,6 +23,7 @@ function realHandler() {
           .from('candidates')
           .select('id')
           .eq('id', id)
+          .neq('status', 'desistiu') // quem desistiu da candidatura não recebe novos votos
           .maybeSingle()
         if (error) throw error
         return data !== null

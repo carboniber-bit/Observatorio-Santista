@@ -16,7 +16,7 @@ export const metadata: Metadata = pageMetadata({
 })
 
 async function loadCandidates(): Promise<{ id: string; name: string }[]> {
-  const { data, error } = await createAnonClient().from('candidates').select('id, name')
+  const { data, error } = await createAnonClient().from('candidates').select('id, name').neq('status', 'desistiu')
   if (error) throw new Error('Falha ao carregar candidatos')
   const rows = (data ?? []) as { id: string; name: string }[]
   // Ordem alfabética fixa e neutra, igual para todos os visitantes.
