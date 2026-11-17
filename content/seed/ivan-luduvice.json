@@ -102,6 +102,23 @@
           "excerpt": "\"uma reformulação completa do Sócio-Rei\""
         }
       ]
+    },
+    {
+      "candidateSlug": "ivan-luduvice",
+      "themeSlug": "estatuto-processo-eleitoral",
+      "description": "Segundo A Crítica, apresentou pedido à Justiça para suspender a votação da reforma do estatuto; o Tribunal de Justiça indeferiu o pedido.",
+      "sourceKind": "reportagem",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://acritica.net/esportes/futebol/santos-vota-mudanca-no-estatuto-que-pode-permitir-investidor-com-80-do-futebol/",
+          "outlet": "A Crítica",
+          "publishedOn": "2026-11-04",
+          "consultedOn": "2026-11-16",
+          "kind": "reportagem",
+          "excerpt": "\"apresentou um pedido à Justiça apontando possíveis irregularidades\""
+        }
+      ]
     }
   ]
 }

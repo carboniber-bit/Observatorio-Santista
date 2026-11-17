@@ -76,9 +76,15 @@ candidato, tema e descrição já existente é pulada. Requer Node 22.6 ou super
 
 ## Lote de 16/11/2026
 
-As 19 entradas atuais (2 de Teixeira, 6 de Luduvice, 5 de Quaresma, 6 de Maruca) foram conferidas com o texto integral
-das matérias (Gazeta Esportiva 12/11/2026, LANCE! 14/10/2026 e Estadão 17/08/2026), copiado por quem opera o projeto em
-16/11/2026: cada trecho entre aspas aparece literalmente no texto recebido. `consultedOn` é essa data. As propostas
-entram como `em_revisao`; antes de publicar em `/admin/propostas`, abra o link e confirme que o trecho continua igual.
-Fora do lote por falta de data ou de endereço confirmado: plano de gestão de Quaresma (sem data na página), matérias da
-Máquina do Esporte, do Bolavip e do LANCE! sobre Maruca.
+As 24 entradas atuais (2 de Teixeira, 7 de Luduvice, 9 de Quaresma, 6 de Maruca) foram conferidas com o texto integral
+das fontes (Gazeta Esportiva 12/11/2026, LANCE! 14/10/2026, Estadão 17/08/2026, A Crítica 04/11/2026 e plano de gestão
+da chapa Quaresma), copiado por quem opera o projeto em 16/11/2026: cada trecho entre aspas aparece literalmente no texto
+recebido. `consultedOn` é essa data. As propostas entram como `em_revisao`; antes de publicar em `/admin/propostas`,
+abra o link e confirme que o trecho continua igual.
+
+O plano de gestão de Quaresma (quaresmapresidentesfc.com/propostas) não traz data de publicação; usamos a data da consulta
+(2026-11-16) em `publishedOn`. Confirme que o endereço abre antes de publicar.
+
+Fora do lote: matérias da Máquina do Esporte, do Bolavip (nota da oposição sobre o estatuto, sem endereço confirmado) e do
+LANCE! sobre Maruca. Afirmações que um resumo de IA trouxe e que não constam em nenhum texto recebido (CT em Praia Grande,
+torcida única, ação de Maruca no TJ-SP, apoio de Teixeira ao estatuto, entre outras) não entram.
