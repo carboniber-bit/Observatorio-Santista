@@ -1,41 +1,158 @@
 @import "tailwindcss";
 
-@theme {
-  /* Paleta: preto, branco e cinzas neutros. Contrastes sobre paper (#ffffff):
-     ink 18.9:1, gray-4 10.3:1, gray-3 4.7:1 (AA para texto normal). */
-  --color-ink: #111111;
-  --color-paper: #ffffff;
-  --color-gray-1: #f2f2f2;
-  --color-gray-2: #d4d4d4;
-  --color-gray-3: #737373;
-  --color-gray-4: #404040;
+/* Tokens semânticos. Mantemos os nomes ink/paper/gray-N: todo o site já os usa,
+   então o modo escuro e o novo visual valem para todas as telas de uma vez.
+   Contraste (WCAG AA ≥ 4.5:1) — claro: ink/paper 17:1, gray-4 10:1, gray-3 4.8:1;
+   escuro: ink/paper 16:1, gray-4 12:1, gray-3 6.5:1. */
+:root {
+  --ink: #0f172a;
+  --paper: #ffffff;
+  --gray-1: #f1f5f9;
+  --gray-2: #d5dde8;
+  --gray-3: #5b6b82;
+  --gray-4: #334155;
+  --accent: #0369a1;
+  --chart-1: #0f172a;
+  --chart-2: #475569;
+  --chart-3: #94a3b8;
+  --chart-4: #cbd5e1;
+  --radius: 0.875rem;
+  color-scheme: light;
+}
 
-  /* Séries de gráficos, distinguíveis em escala de cinza. */
-  --color-chart-1: #111111;
-  --color-chart-2: #595959;
-  --color-chart-3: #8c8c8c;
-  --color-chart-4: #bfbfbf;
+:root[data-theme="dark"] {
+  --ink: #f1f5f9;
+  --paper: #0b1220;
+  --gray-1: #131c2e;
+  --gray-2: #2b3850;
+  --gray-3: #9fb0c8;
+  --gray-4: #cbd5e1;
+  --accent: #7dd3fc;
+  --chart-1: #f1f5f9;
+  --chart-2: #b6c3d6;
+  --chart-3: #7b8ba3;
+  --chart-4: #475569;
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #f1f5f9;
+    --paper: #0b1220;
+    --gray-1: #131c2e;
+    --gray-2: #2b3850;
+    --gray-3: #9fb0c8;
+    --gray-4: #cbd5e1;
+    --accent: #7dd3fc;
+    --chart-1: #f1f5f9;
+    --chart-2: #b6c3d6;
+    --chart-3: #7b8ba3;
+    --chart-4: #475569;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-gray-1: var(--gray-1);
+  --color-gray-2: var(--gray-2);
+  --color-gray-3: var(--gray-3);
+  --color-gray-4: var(--gray-4);
+  --color-accent: var(--accent);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
 
   --font-serif: Georgia, "Times New Roman", Times, serif;
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
+/* Tamanho do texto (acessibilidade): escala o rem de toda a interface. */
+html { font-size: 100%; }
+html[data-text-size="lg"] { font-size: 112.5%; }
+html[data-text-size="xl"] { font-size: 125%; }
+html[data-text-size="xxl"] { font-size: 150%; }
+
 @layer base {
+  html { scroll-behavior: smooth; }
+
   body {
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    line-height: 1.6;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  h1,
-  h2,
-  h3,
-  h4 {
-    font-family: var(--font-serif);
+  h1, h2, h3, h4 {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    text-wrap: balance;
   }
+
+  a { text-underline-offset: 3px; }
 
   :focus-visible {
-    outline: 2px solid var(--color-ink);
+    outline: 3px solid var(--color-accent);
     outline-offset: 2px;
+    border-radius: 0.375rem;
   }
+
+  /* Curvas nas bordas: campos, botões, tabelas, grupos e blocos. */
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea,
+  button,
+  summary,
+  fieldset,
+  details,
+  blockquote,
+  article,
+  section[class*="border"],
+  div[class*="border"],
+  li[class*="border"],
+  a[class*="border"],
+  span[class*="border"] {
+    border-radius: var(--radius);
+  }
+
+  /* Rótulos e selos pequenos ficam mais arredondados. */
+  span[class*="border"] { border-radius: 9999px; }
+
+  table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid var(--color-gray-2);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  button, a[role="button"], summary, input[type="submit"] {
+    min-height: 2.75rem;
+    transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    transition-duration: 0.001ms !important;
+    animation-duration: 0.001ms !important;
+  }
+}
+
+html[data-contrast="high"] {
+  --gray-2: var(--ink);
+  --gray-3: var(--ink);
+}
+
+/* Logo preto com fundo transparente: no escuro, inverte para branco. */
+.brand-art { filter: none; }
+:root[data-theme="dark"] .brand-art { filter: invert(1); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .brand-art { filter: invert(1); }
 }

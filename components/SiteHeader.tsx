@@ -1,5 +1,6 @@
-import Link from 'next/link';
-import { BRAND_NAME } from '@/lib/brand';
+import Image from 'next/image'
+import Link from 'next/link'
+import { AccessibilityControls } from '@/components/AccessibilityControls'
 
 const NAV_ITEMS = [
   { label: 'Início', href: '/' },
@@ -12,22 +13,38 @@ const NAV_ITEMS = [
   { label: 'Histórico', href: '/historico' },
   { label: 'Metodologia', href: '/metodologia' },
   { label: 'Sobre', href: '/sobre' },
-] as const;
+] as const
 
 export function SiteHeader() {
   return (
     <header className="border-b border-gray-2 bg-paper">
-      <div className="mx-auto flex max-w-5xl flex-col gap-3 px-4 py-4">
-        <Link href="/" className="font-serif text-lg font-bold tracking-wide text-ink sm:text-xl">
-          {BRAND_NAME}
-        </Link>
+      <div className="mx-auto flex max-w-5xl flex-col gap-4 px-4 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <Link href="/" className="flex items-center gap-3 text-ink">
+            <Image
+              src="/brand/emblem.webp"
+              alt=""
+              width={44}
+              height={45}
+              priority
+              unoptimized
+              className="brand-art h-11 w-auto"
+            />
+            <span className="text-base font-extrabold uppercase leading-tight tracking-wide sm:text-lg">
+              Observatório
+              <br />
+              Santista
+            </span>
+          </Link>
+          <AccessibilityControls />
+        </div>
         <nav aria-label="Principal">
-          <ul className="flex flex-wrap gap-x-4 gap-y-2 text-sm">
+          <ul className="flex flex-wrap gap-2 text-sm">
             {NAV_ITEMS.map((item) => (
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="py-1 text-gray-4 underline-offset-4 hover:text-ink hover:underline focus-visible:underline"
+                  className="inline-flex min-h-11 items-center rounded-full px-3 text-gray-4 hover:bg-gray-1 hover:text-ink focus-visible:bg-gray-1"
                 >
                   {item.label}
                 </Link>
@@ -37,5 +54,5 @@ export function SiteHeader() {
         </nav>
       </div>
     </header>
-  );
+  )
 }

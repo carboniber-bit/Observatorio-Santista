@@ -28,10 +28,10 @@ export function DailyChart({ data, title }: Props) {
         {ready && (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={rows} margin={{ top: 8, right: 16, bottom: 4, left: 0 }}>
-              <XAxis dataKey="label" stroke="#404040" tick={{ fill: '#111111', fontSize: 12 }} />
-              <YAxis allowDecimals={false} stroke="#404040" width={40} />
-              <Tooltip formatter={(value) => [`${value} votos`, 'Votos']} cursor={{ fill: '#f2f2f2' }} />
-              <Bar dataKey="votes" fill={patternFill(prefix, 1)} stroke="#111111" isAnimationActive={false} />
+              <XAxis dataKey="label" stroke="var(--gray-4)" tick={{ fill: 'var(--ink)', fontSize: 12 }} />
+              <YAxis allowDecimals={false} stroke="var(--gray-4)" width={40} />
+              <Tooltip formatter={(value) => [`${value} votos`, 'Votos']} cursor={{ fill: 'var(--gray-1)' }} />
+              <Bar dataKey="votes" fill={patternFill(prefix, 1)} stroke="var(--ink)" isAnimationActive={false} />
             </BarChart>
           </ResponsiveContainer>
         )}

@@ -22,10 +22,10 @@ export function BarsChart({ data, title }: Props) {
         {ready && (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} layout="vertical" margin={{ top: 4, right: 24, bottom: 4, left: 8 }}>
-              <XAxis type="number" allowDecimals={false} stroke="#404040" />
-              <YAxis type="category" dataKey="label" width={130} stroke="#404040" tick={{ fill: '#111111', fontSize: 13 }} />
-              <Tooltip formatter={(value) => [`${value} votos`, 'Votos']} cursor={{ fill: '#f2f2f2' }} />
-              <Bar dataKey="votes" stroke="#111111" isAnimationActive={false}>
+              <XAxis type="number" allowDecimals={false} stroke="var(--gray-4)" />
+              <YAxis type="category" dataKey="label" width={130} stroke="var(--gray-4)" tick={{ fill: 'var(--ink)', fontSize: 13 }} />
+              <Tooltip formatter={(value) => [`${value} votos`, 'Votos']} cursor={{ fill: 'var(--gray-1)' }} />
+              <Bar dataKey="votes" stroke="var(--ink)" isAnimationActive={false}>
                 {data.map((d, i) => (
                   <Cell key={d.label} fill={patternFill(prefix, i)} />
                 ))}

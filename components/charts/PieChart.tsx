@@ -29,7 +29,7 @@ export function PieChart({ data, title, hideChart = false }: Props) {
                   dataKey="votes"
                   nameKey="label"
                   outerRadius="80%"
-                  stroke="#111111"
+                  stroke="var(--ink)"
                   isAnimationActive={false}
                 >
                   {data.map((d, i) => (

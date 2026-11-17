@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from 'react'
 
-// Mesmos valores de --color-chart-1..4 em app/globals.css (atributos SVG com hex
-// evitam depender de variáveis CSS dentro do SVG gerado pelo Recharts).
-export const CHART_TONES = ['#111111', '#595959', '#8c8c8c', '#bfbfbf'] as const
+// Variáveis CSS de app/globals.css (mudam no modo escuro; atributos SVG aceitam var())
+export const CHART_TONES = ['var(--chart-1)', 'var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)'] as const
 // Cor das marcas do padrão sobre cada tom (contraste suficiente em cada fundo).
-const MARK_COLORS = ['#ffffff', '#ffffff', '#111111', '#111111'] as const
+const MARK_COLORS = ['var(--paper)', 'var(--paper)', 'var(--ink)', 'var(--ink)'] as const
 export const PATTERN_NAMES = ['sólido', 'hachura diagonal', 'pontos', 'hachura cruzada'] as const
 
 export function toneIndex(i: number): number {
@@ -57,7 +56,7 @@ export function PatternDefs({ prefix }: { prefix: string }) {
 export function Swatch({ prefix, index }: { prefix: string; index: number }) {
   return (
     <svg width="16" height="16" aria-hidden="true" focusable="false" className="inline-block align-middle">
-      <rect width="16" height="16" fill={patternFill(prefix, index)} stroke="#111111" strokeWidth="1" />
+      <rect width="16" height="16" fill={patternFill(prefix, index)} stroke="var(--ink)" strokeWidth="1" />
     </svg>
   )
 }
