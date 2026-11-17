@@ -1,4 +1,5 @@
 import type { Comparison } from '@/lib/editorial/comparison'
+import { candidacyStatusLabel } from '@/lib/editorial/labels'
 import { ProposalItem } from './ProposalItem'
 
 export function ComparatorTable({ comparison }: { comparison: Comparison }) {
@@ -25,6 +26,11 @@ export function ComparatorTable({ comparison }: { comparison: Comparison }) {
                 className="border border-gray-3 bg-gray-1 p-3 font-serif"
               >
                 {candidate.name}
+                {candidate.status !== 'confirmada' && (
+                  <span className="mt-1 block font-sans text-sm font-normal text-gray-4">
+                    {candidacyStatusLabel(candidate.status)}
+                  </span>
+                )}
               </th>
             ))}
           </tr>

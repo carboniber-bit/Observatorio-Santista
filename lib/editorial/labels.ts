@@ -20,7 +20,7 @@ export const SOURCE_KIND_LABELS: Record<string, string> = {
 }
 
 export const CANDIDACY_STATUS_LABELS: Record<string, string> = {
-  a_confirmar: 'Candidatura a confirmar',
+  a_confirmar: 'A confirmar candidatura',
   confirmada: 'Candidatura confirmada',
   desistiu: 'Desistiu da candidatura',
 }
