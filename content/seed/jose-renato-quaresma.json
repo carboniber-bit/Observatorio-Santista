@@ -85,6 +85,74 @@
           "excerpt": "\"um Escritório de Gestão Estratégica\""
         }
       ]
+    },
+    {
+      "candidateSlug": "jose-renato-quaresma",
+      "themeSlug": "futebol-feminino",
+      "description": "Segundo o plano de gestão da chapa, prevê planejamento e orçamento próprios para as Sereias da Vila.",
+      "sourceKind": "documento_da_chapa",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://quaresmapresidentesfc.com/propostas/",
+          "outlet": "Plano de gestão da chapa Quaresma (site oficial)",
+          "publishedOn": "2026-11-16",
+          "consultedOn": "2026-11-16",
+          "kind": "documento_da_chapa",
+          "excerpt": "\"Planejamento e orçamento próprios para as Sereias\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "jose-renato-quaresma",
+      "themeSlug": "socios-torcida",
+      "description": "Segundo o plano de gestão da chapa, propõe um Sócio Rei com fidelidade, benefícios e cashback.",
+      "sourceKind": "documento_da_chapa",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://quaresmapresidentesfc.com/propostas/",
+          "outlet": "Plano de gestão da chapa Quaresma (site oficial)",
+          "publishedOn": "2026-11-16",
+          "consultedOn": "2026-11-16",
+          "kind": "documento_da_chapa",
+          "excerpt": "\"Sócio Rei com fidelidade, benefícios e cashback\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "jose-renato-quaresma",
+      "themeSlug": "estadio-patrimonio",
+      "description": "Segundo o plano de gestão da chapa, prevê um estádio com viabilidade e financiamento definidos.",
+      "sourceKind": "documento_da_chapa",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://quaresmapresidentesfc.com/propostas/",
+          "outlet": "Plano de gestão da chapa Quaresma (site oficial)",
+          "publishedOn": "2026-11-16",
+          "consultedOn": "2026-11-16",
+          "kind": "documento_da_chapa",
+          "excerpt": "\"Estádio com viabilidade e financiamento definidos\""
+        }
+      ]
+    },
+    {
+      "candidateSlug": "jose-renato-quaresma",
+      "themeSlug": "receitas-marketing",
+      "description": "Segundo o plano de gestão da chapa, prevê internacionalização e valorização dos patrocínios.",
+      "sourceKind": "documento_da_chapa",
+      "referenceYear": 2026,
+      "sources": [
+        {
+          "url": "https://quaresmapresidentesfc.com/propostas/",
+          "outlet": "Plano de gestão da chapa Quaresma (site oficial)",
+          "publishedOn": "2026-11-16",
+          "consultedOn": "2026-11-16",
+          "kind": "documento_da_chapa",
+          "excerpt": "\"Internacionalização e valorização dos patrocínios\""
+        }
+      ]
     }
   ]
 }

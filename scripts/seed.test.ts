@@ -93,14 +93,14 @@ function fakeDb(opts: { missingCandidate?: string; missingTheme?: string; failSo
 }
 
 describe('arquivos reais', () => {
-  it('carrega as 19 propostas conferidas com o texto das matérias, citações de até 14 palavras e sem nota pendente', () => {
+  it('carrega as 24 propostas conferidas com o texto das matérias, citações de até 14 palavras e sem nota pendente', () => {
     const dir = path.join(ROOT, 'content/seed')
     const entries = loadSeed(dir)
-    expect(entries).toHaveLength(19)
+    expect(entries).toHaveLength(24)
     const per = (slug: string) => entries.filter((e) => e.candidateSlug === slug).length
     expect(per('marcelo-teixeira')).toBe(2)
-    expect(per('ivan-luduvice')).toBe(6)
-    expect(per('jose-renato-quaresma')).toBe(5)
+    expect(per('ivan-luduvice')).toBe(7)
+    expect(per('jose-renato-quaresma')).toBe(9)
     expect(per('mauricio-maruca')).toBe(6)
     for (const slug of CANDIDATE_SLUGS) {
       const raw = JSON.parse(readFileSync(path.join(dir, `${slug}.json`), 'utf8'))
