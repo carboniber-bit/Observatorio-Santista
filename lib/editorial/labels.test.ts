@@ -37,7 +37,7 @@ describe('labels', () => {
     expect(SOURCE_KIND_LABELS.declaracao_como_presidente).toBe(
       'Declaração como presidente em exercício',
     )
-    expect(CANDIDACY_STATUS_LABELS.a_confirmar).toBe('Candidatura a confirmar')
+    expect(CANDIDACY_STATUS_LABELS.a_confirmar).toBe('A confirmar candidatura')
     expect(CANDIDACY_STATUS_LABELS.confirmada).toBe('Candidatura confirmada')
     expect(CANDIDACY_STATUS_LABELS.desistiu).toBe('Desistiu da candidatura')
     expect(candidacyStatusLabel('outro')).toBe('outro')

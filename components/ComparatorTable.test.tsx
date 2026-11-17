@@ -50,4 +50,20 @@ describe('ComparatorTable', () => {
     expect(within(row).getByText('Sem fonte cadastrada.')).toBeInTheDocument()
     expect(within(row).getByText(MISSING_PROPOSAL_TEXT)).toBeInTheDocument()
   })
+
+  it('mostra a situação da candidatura só de quem não está confirmado', () => {
+    const comparison = composeComparison(
+      [
+        cand('ana', 'Ana'),
+        { ...cand('beto', 'Beto'), status: 'desistiu' },
+        { ...cand('caio', 'Caio'), status: 'a_confirmar' },
+      ],
+      themes,
+      { 'c-ana': [prop] },
+    )
+    render(<ComparatorTable comparison={comparison} />)
+    expect(screen.getByRole('columnheader', { name: 'Ana' })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: /Beto.*Desistiu da candidatura/ })).toBeInTheDocument()
+    expect(screen.getByRole('columnheader', { name: /Caio.*A confirmar candidatura/ })).toBeInTheDocument()
+  })
 })
