@@ -5,6 +5,7 @@ import {
   formRetractProposal,
   formSaveProposal,
 } from '@/lib/admin/form-actions'
+import { PROPOSAL_TABS, parseProposalTab, tabOfStatus } from '@/lib/admin/proposal-tabs'
 import { sourceKindLabel } from '@/lib/editorial/labels'
 import {
   BUTTON,
@@ -39,7 +40,7 @@ type ProposalRow = {
 export default async function ProposalsPage({
   searchParams,
 }: {
-  searchParams: Promise<Flash & { editar?: string }>
+  searchParams: Promise<Flash & { editar?: string; aba?: string }>
 }) {
   const params = await searchParams
   const { supabase } = await requireAdmin()
@@ -51,8 +52,11 @@ export default async function ProposalsPage({
     supabase.from('candidates').select('id, name').order('name'),
     supabase.from('themes').select('id, name').order('position'),
   ])
-  const rows = (proposals.data ?? []) as ProposalRow[]
-  const editing = rows.find((p) => p.id === params.editar)
+  const allRows = (proposals.data ?? []) as ProposalRow[]
+  const activeTab = parseProposalTab(params.aba)
+  const counts = Object.fromEntries(PROPOSAL_TABS.map((t) => [t.id, allRows.filter((p) => tabOfStatus(p.status) === t.id).length]))
+  const rows = allRows.filter((p) => tabOfStatus(p.status) === activeTab)
+  const editing = allRows.find((p) => p.id === params.editar)
   const candidateOptions = ((candidates.data ?? []) as { id: string; name: string }[]).map((c) => ({
     value: c.id,
     label: c.name,
@@ -91,9 +95,23 @@ export default async function ProposalsPage({
 
       <section aria-labelledby="lista-propostas">
         <h2 id="lista-propostas" className="mb-4 text-2xl font-bold">
-          Todas as propostas
+          Propostas
         </h2>
-        {rows.length === 0 ? <p>Nenhuma proposta cadastrada.</p> : null}
+        <nav aria-label="Situação das propostas" className="mb-6 flex flex-wrap gap-2">
+          {PROPOSAL_TABS.map((t) => (
+            <a
+              key={t.id}
+              href={`/admin/propostas?aba=${t.id}#lista-propostas`}
+              aria-current={t.id === activeTab ? 'page' : undefined}
+              className={`inline-flex min-h-11 items-center rounded-full border px-4 text-sm font-semibold ${
+                t.id === activeTab ? 'border-ink bg-ink text-paper' : 'border-gray-2 text-ink hover:bg-gray-1'
+              }`}
+            >
+              {t.label} ({counts[t.id]})
+            </a>
+          ))}
+        </nav>
+        {rows.length === 0 ? <p>Nenhuma proposta nesta aba.</p> : null}
         <ul className="space-y-6">
           {rows.map((p) => {
             const withExcerpt = (p.sources ?? []).filter((s) => (s.excerpt ?? '').trim()).length
@@ -105,7 +123,7 @@ export default async function ProposalsPage({
                 </p>
                 <p className="my-2">{p.description}</p>
                 <p className="mb-3">
-                  <a href={`/admin/propostas?editar=${p.id}#form-proposta`} className="underline underline-offset-4">
+                  <a href={`/admin/propostas?aba=${activeTab}&editar=${p.id}#form-proposta`} className="underline underline-offset-4">
                     Editar
                   </a>
                 </p>
