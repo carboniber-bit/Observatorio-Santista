@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { CreditsSection } from '@/components/Credits'
 import { BRAND_NAME } from '@/lib/brand'
 import { pageMetadata } from '@/lib/seo'
 
@@ -46,6 +47,7 @@ export default function SobrePage() {
           </li>
         </ul>
       </nav>
+      <CreditsSection />
     </main>
   )
 }
