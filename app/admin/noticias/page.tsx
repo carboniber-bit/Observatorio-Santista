@@ -1,5 +1,5 @@
 import { requireAdmin } from '@/lib/admin/auth'
-import { formNewsStatus, formSaveNews } from '@/lib/admin/form-actions'
+import { formPublishNews, formRetractNews, formSaveNews } from '@/lib/admin/form-actions'
 import { BADGE_LABELS, NEWS_CATEGORY_LABELS } from '@/lib/editorial/labels'
 import { BUTTON, BUTTON_SECONDARY, Field, FlashMessage, PageShell, ReasonField, SelectField, statusLabel, type Flash } from '../_ui'
 
@@ -71,14 +71,14 @@ export default async function NewsAdminPage({
               </p>
               <details>
                 <summary className="min-h-11 cursor-pointer py-2 font-semibold">Mudar situação</summary>
-                <form action={formNewsStatus} className="mt-3 max-w-xl space-y-4">
+                <form className="mt-3 max-w-xl space-y-4">
                   <input type="hidden" name="id" value={n.id} />
                   <ReasonField id={`nr-${n.id}`} />
                   <div className="flex flex-wrap gap-3">
-                    <button type="submit" name="op" value="publish" className={BUTTON}>
+                    <button type="submit" formAction={formPublishNews} className={BUTTON}>
                       Publicar
                     </button>
-                    <button type="submit" name="op" value="retract" className={BUTTON_SECONDARY}>
+                    <button type="submit" formAction={formRetractNews} className={BUTTON_SECONDARY}>
                       Retirar
                     </button>
                   </div>

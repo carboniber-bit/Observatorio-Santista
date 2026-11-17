@@ -105,7 +105,7 @@ export function HomeView({ summary, candidates, news, proposals }: HomeViewProps
               <li key={c.id}>
                 <Link
                   href={`/candidatos/${c.slug}`}
-                  className="flex min-h-11 items-center border border-gray-3 p-4 font-semibold underline-offset-4 hover:underline"
+                  className={`flex min-h-11 items-center border border-gray-3 p-4 font-semibold underline-offset-4 hover:underline${c.status === 'desistiu' ? ' text-danger' : ''}`}
                 >
                   {c.name}
                 </Link>

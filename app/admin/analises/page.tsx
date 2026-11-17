@@ -1,5 +1,5 @@
 import { requireAdmin } from '@/lib/admin/auth'
-import { formAnalysisStatus, formSaveAnalysis } from '@/lib/admin/form-actions'
+import { formPublishAnalysis, formRetractAnalysis, formSaveAnalysis } from '@/lib/admin/form-actions'
 import { BUTTON, BUTTON_SECONDARY, Field, FlashMessage, PageShell, ReasonField, statusLabel, type Flash } from '../_ui'
 
 export const dynamic = 'force-dynamic'
@@ -70,14 +70,14 @@ export default async function AnalysesAdminPage({
               </p>
               <details>
                 <summary className="min-h-11 cursor-pointer py-2 font-semibold">Mudar situação</summary>
-                <form action={formAnalysisStatus} className="mt-3 max-w-xl space-y-4">
+                <form className="mt-3 max-w-xl space-y-4">
                   <input type="hidden" name="id" value={a.id} />
                   <ReasonField id={`ar-${a.id}`} />
                   <div className="flex flex-wrap gap-3">
-                    <button type="submit" name="op" value="publish" className={BUTTON}>
+                    <button type="submit" formAction={formPublishAnalysis} className={BUTTON}>
                       Publicar
                     </button>
-                    <button type="submit" name="op" value="retract" className={BUTTON_SECONDARY}>
+                    <button type="submit" formAction={formRetractAnalysis} className={BUTTON_SECONDARY}>
                       Retirar
                     </button>
                   </div>

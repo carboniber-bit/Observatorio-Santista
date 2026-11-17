@@ -136,12 +136,14 @@ export function CandidateProfile({ candidate, themes, proposals }: Props) {
               {initials(candidate.name)}
             </span>
           )}
-          <h1 className="font-serif text-3xl font-bold sm:text-4xl">{candidate.name}</h1>
+          <h1 className={`font-serif text-3xl font-bold sm:text-4xl${candidate.status === 'desistiu' ? ' text-danger' : ''}`}>{candidate.name}</h1>
         </div>
       </Section>
 
       <Section label={L_STATUS}>
-        <p>{candidacyStatusLabel(candidate.status)}</p>
+        <p className={candidate.status === 'desistiu' ? 'font-semibold text-danger' : undefined}>
+          {candidacyStatusLabel(candidate.status)}
+        </p>
       </Section>
 
       <Section label={L_BIO}>

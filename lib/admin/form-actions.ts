@@ -142,6 +142,27 @@ export async function formSaveNews(fd: FormData): Promise<void> {
   back('/admin/noticias', result, 'noticia', id || undefined)
 }
 
+// Uma Server Action por botão: a operação é fixada no servidor, sem depender do name/value do botão.
+export async function formPublishNews(fd: FormData): Promise<void> {
+  const result = await actions.publishNews(str(fd, 'id'), str(fd, 'reason'))
+  back('/admin/noticias', result, 'publicada')
+}
+
+export async function formRetractNews(fd: FormData): Promise<void> {
+  const result = await actions.retractNews(str(fd, 'id'), str(fd, 'reason'))
+  back('/admin/noticias', result, 'retirada')
+}
+
+export async function formPublishAnalysis(fd: FormData): Promise<void> {
+  const result = await actions.publishAnalysis(str(fd, 'id'), str(fd, 'reason'))
+  back('/admin/analises', result, 'publicada')
+}
+
+export async function formRetractAnalysis(fd: FormData): Promise<void> {
+  const result = await actions.retractAnalysis(str(fd, 'id'), str(fd, 'reason'))
+  back('/admin/analises', result, 'retirada')
+}
+
 export async function formNewsStatus(fd: FormData): Promise<void> {
   const op = str(fd, 'op')
   const id = str(fd, 'id')

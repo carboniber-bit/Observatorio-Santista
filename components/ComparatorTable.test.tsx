@@ -65,5 +65,8 @@ describe('ComparatorTable', () => {
     expect(screen.getByRole('columnheader', { name: 'Ana' })).toBeInTheDocument()
     expect(screen.getByRole('columnheader', { name: /Beto.*Desistiu da candidatura/ })).toBeInTheDocument()
     expect(screen.getByRole('columnheader', { name: /Caio.*A confirmar candidatura/ })).toBeInTheDocument()
+    expect(screen.getByText('Desistiu da candidatura')).toHaveClass('text-danger')
+    expect(screen.getByText('Beto')).toHaveClass('text-danger')
+    expect(screen.getByText('Ana')).not.toHaveClass('text-danger')
   })
 })

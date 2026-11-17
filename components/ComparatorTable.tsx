@@ -25,9 +25,13 @@ export function ComparatorTable({ comparison }: { comparison: Comparison }) {
                 scope="col"
                 className="border border-gray-3 bg-gray-1 p-3 font-serif"
               >
-                {candidate.name}
+                <span className={candidate.status === 'desistiu' ? 'text-danger' : undefined}>{candidate.name}</span>
                 {candidate.status !== 'confirmada' && (
-                  <span className="mt-1 block font-sans text-sm font-normal text-gray-4">
+                  <span
+                    className={`mt-1 block font-sans text-sm font-normal ${
+                      candidate.status === 'desistiu' ? 'font-semibold text-danger' : 'text-gray-4'
+                    }`}
+                  >
                     {candidacyStatusLabel(candidate.status)}
                   </span>
                 )}
