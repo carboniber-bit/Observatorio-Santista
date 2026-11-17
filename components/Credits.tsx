@@ -17,7 +17,7 @@ function CreditsLink() {
 /** Linha discreta de crédito, no fim de todas as páginas (acima do aviso fixo de independência). */
 export function CreditsLine() {
   return (
-    <p className="mx-auto max-w-5xl px-4 py-6 text-center text-sm text-gray-3">
+    <p className="mx-auto max-w-5xl px-4 pb-6 pt-1 text-center text-sm text-gray-3">
       Desenvolvido por <CreditsLink />
     </p>
   )

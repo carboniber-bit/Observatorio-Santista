@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import './globals.css';
+import { ContactLine } from '@/components/Contact';
 import { CreditsLine } from '@/components/Credits';
 import { IndependenceBanner } from '@/components/IndependenceBanner';
 import { SiteHeader } from '@/components/SiteHeader';
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="min-h-screen bg-paper pb-24 text-ink antialiased sm:pb-16">
         <SiteHeader />
         {children}
+        <ContactLine />
         <CreditsLine />
         <IndependenceBanner />
       </body>

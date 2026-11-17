@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { ContactSection } from '@/components/Contact'
 import { CorrectionForm } from '@/components/CorrectionForm'
 import { BRAND_NAME } from '@/lib/brand'
 import { pageMetadata } from '@/lib/seo'
@@ -22,6 +23,7 @@ export default function CorrigirPage() {
         pedido.
       </p>
       <CorrectionForm />
+      <ContactSection />
     </main>
   )
 }
