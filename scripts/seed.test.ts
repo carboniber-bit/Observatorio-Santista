@@ -108,7 +108,7 @@ describe('arquivos reais', () => {
     }
     for (const e of entries) {
       expect(e.referenceYear).toBe(2026)
-      expect(['reportagem', 'entrevista_direta']).toContain(e.sourceKind)
+      expect(['reportagem', 'entrevista_direta', 'documento_da_chapa']).toContain(e.sourceKind)
       for (const s of e.sources) {
         expect(s.consultedOn).toBe('2026-11-16')
         expect(hasPendingQuoteMark(s.excerpt)).toBe(false)
