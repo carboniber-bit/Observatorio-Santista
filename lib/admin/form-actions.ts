@@ -53,8 +53,11 @@ export async function formSaveProposal(fd: FormData): Promise<void> {
   back('/admin/propostas', result, 'proposta', id || undefined)
 }
 
-export async function formProposalStatus(fd: FormData): Promise<void> {
-  const op = str(fd, 'op')
+type StatusOp = 'publish' | 'correct' | 'retract'
+
+// A operação é fixada no servidor por cada Server Action (um botão = uma ação), em vez de depender
+// de name/value do botão enviante no FormData. Assim "Operação inválida" não pode ocorrer.
+async function applyProposalStatus(op: StatusOp, fd: FormData): Promise<void> {
   const id = str(fd, 'id')
   const reason = str(fd, 'reason')
   const sourceId = str(fd, 'sourceId') || undefined
@@ -66,14 +69,30 @@ export async function formProposalStatus(fd: FormData): Promise<void> {
   } else if (op === 'correct') {
     result = await actions.correctProposal(id, reason, sourceId)
     msg = 'corrigida'
-  } else if (op === 'retract') {
+  } else {
     result = await actions.retractProposal(id, reason, sourceId)
     msg = 'retirada'
-  } else {
-    result = { ok: false, error: 'Operação inválida.' }
-    msg = ''
   }
   back('/admin/propostas', result, msg)
+}
+
+export async function formPublishProposal(fd: FormData): Promise<void> {
+  return applyProposalStatus('publish', fd)
+}
+
+export async function formCorrectProposal(fd: FormData): Promise<void> {
+  return applyProposalStatus('correct', fd)
+}
+
+export async function formRetractProposal(fd: FormData): Promise<void> {
+  return applyProposalStatus('retract', fd)
+}
+
+// Compatibilidade: formulários antigos que enviam `op` no FormData.
+export async function formProposalStatus(fd: FormData): Promise<void> {
+  const op = str(fd, 'op')
+  if (op === 'publish' || op === 'correct' || op === 'retract') return applyProposalStatus(op, fd)
+  back('/admin/propostas', { ok: false, error: 'Operação inválida.' }, '')
 }
 
 export async function formAddSource(fd: FormData): Promise<void> {

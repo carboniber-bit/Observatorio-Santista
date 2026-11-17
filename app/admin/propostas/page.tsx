@@ -1,10 +1,13 @@
 import { requireAdmin } from '@/lib/admin/auth'
-import { formProposalStatus, formSaveProposal } from '@/lib/admin/form-actions'
+import {
+  formCorrectProposal,
+  formPublishProposal,
+  formRetractProposal,
+  formSaveProposal,
+} from '@/lib/admin/form-actions'
 import { sourceKindLabel } from '@/lib/editorial/labels'
 import {
   BUTTON,
-  BUTTON_SECONDARY,
-  FIELD,
   Field,
   FlashMessage,
   PageShell,
@@ -14,6 +17,7 @@ import {
   statusLabel,
   type Flash,
 } from '../_ui'
+import { ProposalStatusForm } from './ProposalStatusForm'
 
 export const dynamic = 'force-dynamic'
 
@@ -107,36 +111,13 @@ export default async function ProposalsPage({
                 </p>
                 <details>
                   <summary className="min-h-11 cursor-pointer py-2 font-semibold">Mudar situação</summary>
-                  <form action={formProposalStatus} className="mt-3 max-w-xl space-y-4">
-                    <input type="hidden" name="id" value={p.id} />
-                    <ReasonField id={`r-${p.id}`} />
-                    {(p.sources ?? []).length > 0 ? (
-                      <div>
-                        <label htmlFor={`s-${p.id}`} className="mb-1 block font-semibold">
-                          Fonte que fundamenta a mudança (opcional)
-                        </label>
-                        <select id={`s-${p.id}`} name="sourceId" defaultValue="" className={FIELD}>
-                          <option value="">Nenhuma</option>
-                          {(p.sources ?? []).map((s) => (
-                            <option key={s.id} value={s.id}>
-                              {s.url}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    ) : null}
-                    <div className="flex flex-wrap gap-3">
-                      <button type="submit" name="op" value="publish" className={BUTTON}>
-                        Publicar
-                      </button>
-                      <button type="submit" name="op" value="correct" className={BUTTON_SECONDARY}>
-                        Marcar como corrigida
-                      </button>
-                      <button type="submit" name="op" value="retract" className={BUTTON_SECONDARY}>
-                        Retirar
-                      </button>
-                    </div>
-                  </form>
+                  <ProposalStatusForm
+                    proposalId={p.id}
+                    sources={(p.sources ?? []).map((source) => ({ id: source.id, url: source.url }))}
+                    publishAction={formPublishProposal}
+                    correctAction={formCorrectProposal}
+                    retractAction={formRetractProposal}
+                  />
                 </details>
               </li>
             )
