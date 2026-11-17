@@ -213,7 +213,7 @@ public/         logo e imagens
 
 - **Encontrou um erro?** Use o formulário **Pedir correção** no site; o pedido é analisado e, se aceito, registrado no histórico público.
 - **Observações ou reclamações:** observatoriosantista2026@gmail.com
-- **Desenvolvimento e design:** [Carboni Digital Business](https://carboni-digital-bussiness.lovable.app/)
+- **Desenvolvimento e design:** [Carboni Digital Business](https://carboni-digital-bussiness.lovable.app/) / Bernardo Carboni
 - **Licença:** ainda não definida; enquanto isso, todos os direitos são reservados ao autor.
 
 ---
